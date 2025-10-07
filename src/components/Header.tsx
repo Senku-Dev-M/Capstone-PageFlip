@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import { logout } from "@/lib/auth";
+import { useAuthSession } from "@/hooks/useAuthSession";
+
 const navLinks = [
   { href: "/", label: "Catalog", requiresAuth: false },
   { href: "/loans", label: "My Loans", requiresAuth: true },
@@ -12,8 +15,21 @@ const navLinks = [
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isLoggedIn = true;
-  const username = "NeoReader";
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { user, isLoading } = useAuthSession();
+  const isLoggedIn = Boolean(user);
+  const username = user?.displayName || user?.email || "Agent";
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Failed to log out", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   const filteredLinks = navLinks.filter(
     (link) => !link.requiresAuth || isLoggedIn,
@@ -68,6 +84,8 @@ export default function Header() {
               </span>
               <button
                 type="button"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
                 className="text-gray-400 transition-colors duration-200 hover:text-pink-500"
                 aria-label="Log out"
               >
@@ -92,6 +110,8 @@ export default function Header() {
                 </svg>
               </button>
             </>
+          ) : isLoading ? (
+            <span className="text-sm font-medium text-gray-400">Connecting...</span>
           ) : (
             <Link
               href="/login"
@@ -151,6 +171,8 @@ export default function Header() {
               </div>
               <button
                 type="button"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
                 className="text-gray-400 transition-colors duration-200 hover:text-pink-500"
               >
                 <svg
@@ -174,6 +196,10 @@ export default function Header() {
                 </svg>
               </button>
             </div>
+          ) : isLoading ? (
+            <span className="block text-center text-xs font-medium uppercase tracking-[0.35em] text-gray-400">
+              Initializing...
+            </span>
           ) : (
             <Link
               href="/login"
