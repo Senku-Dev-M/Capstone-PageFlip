@@ -7,6 +7,7 @@ export interface Book {
   year?: number;
   format?: string;
   tags?: string[];
+  status?: "available" | "borrowed";
 }
 
 // TODO: Extend with availability, ISBNs, reading progress, and cyberpunk metadata.
