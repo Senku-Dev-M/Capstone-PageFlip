@@ -1,4 +1,4 @@
-import BookCard from "@/components/BookCard";
+import CatalogClient from "@/components/CatalogClient";
 import { fetchBooks } from "@/lib/booksApi";
 import type { Book } from "@/types/book";
 
@@ -20,8 +20,8 @@ export default async function CatalogPage() {
           Explore Our Digital Catalog
         </h1>
         <p className="max-w-2xl text-slate-400">
-          Find your next neon-soaked adventure among cyberspace legends,
-          glitchpunk thrillers, and synthwave sagas.
+          Find your next read on the Neo-Net. Tune your filters to surface
+          fresh transmissions from across the digital stacks.
         </p>
       </header>
       <div className="rounded-2xl border border-cyan-500/20 bg-slate-950/60 p-6 shadow-[0_0_35px_rgba(56,189,248,0.12)]">
@@ -34,11 +34,7 @@ export default async function CatalogPage() {
             Loading data from the Neo-Net archives...
           </p>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {books.map((book) => (
-              <BookCard key={book.id} book={book} />
-            ))}
-          </div>
+          <CatalogClient initialBooks={books} />
         )}
       </div>
     </section>
