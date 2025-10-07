@@ -34,16 +34,15 @@ export async function fetchBooks({
   limit = DEFAULT_LIMIT,
   signal,
 }: FetchBooksParams = {}): Promise<Book[]> {
-  const requestInit: RequestInit & { next?: { revalidate: number } } = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    // Cache responses so catalog loads fast while still refreshing periodically.
-    next: { revalidate: 3600 },
-  };
+  const requestInit: RequestInit & { next?: { revalidate: number } } = {};
 
   if (signal) {
     requestInit.signal = signal;
+  }
+
+  if (typeof window === "undefined") {
+    // Cache responses so catalog loads fast while still refreshing periodically on the server.
+    requestInit.next = { revalidate: 3600 };
   }
 
   const response = await fetch(
