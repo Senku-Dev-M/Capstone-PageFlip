@@ -2,6 +2,7 @@ import type { Book } from "@/types/book";
 
 const OPEN_LIBRARY_SEARCH_ENDPOINT = "https://openlibrary.org/search.json";
 const DEFAULT_QUERY = "it";
+const DEFAULT_LIMIT = 40;
 
 const STATUS_COLORS = ["available", "borrowed"] as const;
 
@@ -22,16 +23,32 @@ function buildCoverUrl(doc: {
   return undefined;
 }
 
-export async function fetchBooks(query: string = DEFAULT_QUERY): Promise<Book[]> {
-  const response = await fetch(
-    `${OPEN_LIBRARY_SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&limit=40`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // Cache responses so catalog loads fast while still refreshing periodically.
-      next: { revalidate: 3600 },
+type FetchBooksParams = {
+  query?: string;
+  limit?: number;
+  signal?: AbortSignal;
+};
+
+export async function fetchBooks({
+  query = DEFAULT_QUERY,
+  limit = DEFAULT_LIMIT,
+  signal,
+}: FetchBooksParams = {}): Promise<Book[]> {
+  const requestInit: RequestInit & { next?: { revalidate: number } } = {
+    headers: {
+      "Content-Type": "application/json",
     },
+    // Cache responses so catalog loads fast while still refreshing periodically.
+    next: { revalidate: 3600 },
+  };
+
+  if (signal) {
+    requestInit.signal = signal;
+  }
+
+  const response = await fetch(
+    `${OPEN_LIBRARY_SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&limit=${limit}`,
+    requestInit,
   );
 
   if (!response.ok) {
@@ -53,7 +70,7 @@ export async function fetchBooks(query: string = DEFAULT_QUERY): Promise<Book[]>
 
   const docs = data.docs ?? [];
 
-  return docs.slice(0, 40).map((doc, index) => ({
+  return docs.slice(0, limit).map((doc, index) => ({
     id: doc.key.replace("/works/", ""),
     title: doc.title,
     author: doc.author_name?.[0] ?? "Unknown Author",

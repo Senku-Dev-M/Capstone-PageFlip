@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useBookStore } from "@/store/useBookStore";
 import type { Book } from "@/types/book";
+import { fetchBooks } from "@/lib/booksApi";
 
 import BookGrid from "./BookGrid";
 import CatalogFilters from "./CatalogFilters";
@@ -16,12 +17,69 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
   const books = useBookStore((state) => state.books);
   const filters = useBookStore((state) => state.filters);
   const pagination = useBookStore((state) => state.pagination);
+  const isLoading = useBookStore((state) => state.isLoading);
   const setBooks = useBookStore((state) => state.setBooks);
   const setPage = useBookStore((state) => state.setPage);
+  const setIsLoading = useBookStore((state) => state.setIsLoading);
+
+  const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
+  const hasInitializedSearch = useRef(false);
 
   useEffect(() => {
     setBooks(initialBooks);
   }, [initialBooks, setBooks]);
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      setDebouncedSearch(filters.search);
+    }, 400);
+
+    return () => window.clearTimeout(handle);
+  }, [filters.search]);
+
+  useEffect(() => {
+    if (!hasInitializedSearch.current) {
+      hasInitializedSearch.current = true;
+      return;
+    }
+
+    const controller = new AbortController();
+    let isActive = true;
+
+    const searchQuery = debouncedSearch.trim() || undefined;
+
+    const loadBooks = async () => {
+      setIsLoading(true);
+
+      try {
+        const fetchedBooks = await fetchBooks({
+          query: searchQuery,
+          signal: controller.signal,
+        });
+
+        if (isActive) {
+          setBooks(fetchedBooks);
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        console.error("Failed to fetch books", error);
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadBooks();
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, [debouncedSearch, setBooks, setIsLoading]);
 
   const filteredBooks = useMemo(() => {
     const searchTerm = filters.search.trim().toLowerCase();
@@ -98,6 +156,11 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
   return (
     <div className="space-y-6">
       <CatalogFilters />
+      {isLoading && (
+        <div className="rounded-xl border border-cyan-500/20 bg-slate-950/60 p-4 text-sm text-cyan-200">
+          Scanning the grid for fresh transmissions...
+        </div>
+      )}
       <BookGrid
         books={paginatedBooks}
         emptyState={<p>No transmissions detected. Try adjusting your filters.</p>}
