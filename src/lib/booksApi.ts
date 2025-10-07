@@ -1,7 +1,7 @@
 import type { Book } from "@/types/book";
 
 const OPEN_LIBRARY_SEARCH_ENDPOINT = "https://openlibrary.org/search.json";
-const DEFAULT_QUERY = "cyberpunk";
+const DEFAULT_QUERY = "it";
 
 const STATUS_COLORS = ["available", "borrowed"] as const;
 
