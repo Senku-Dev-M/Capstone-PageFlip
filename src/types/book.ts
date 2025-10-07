@@ -8,6 +8,8 @@ export interface Book {
   format?: string;
   tags?: string[];
   status?: "available" | "borrowed";
+  category?: "Fiction" | "Science" | "History";
+  popularity?: number;
 }
 
 // TODO: Extend with availability, ISBNs, reading progress, and cyberpunk metadata.

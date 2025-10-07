@@ -73,4 +73,34 @@ body {
   backdrop-filter: blur(12px);
 }
 
+.cyber-input,
+.cyber-select {
+  @apply w-full rounded-xl border border-cyan-500/30 bg-slate-950/70 px-4 py-3 text-sm text-slate-100 transition duration-200 placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.12);
+  backdrop-filter: blur(16px);
+}
+
+.cyber-input:focus,
+.cyber-select:focus {
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);
+}
+
+.cyber-select {
+  appearance: none;
+  padding-right: 3rem;
+  background-image: linear-gradient(
+      135deg,
+      rgba(56, 189, 248, 0.25),
+      rgba(14, 165, 233, 0.15)
+    ),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2300f5ff' d='M5 6 0 0h10z'/%3E%3C/svg%3E");
+  background-position: left top, right 1rem center;
+  background-repeat: no-repeat;
+  background-size: cover, 0.75rem 0.5rem;
+}
+
+.cyber-select option {
+  color: #020617;
+}
+
 /* TODO: Add keyframe animations for glitch effects and holographic pulses. */
