@@ -19,7 +19,7 @@ type UserState = {
 
 const initialState = {
   user: null,
-  isLoading: false,
+  isLoading: true,
 };
 
 export const useUserStore = create<UserState>((set) => ({
@@ -30,4 +30,3 @@ export const useUserStore = create<UserState>((set) => ({
 }));
 
 export type { SessionUser };
-// TODO: Integrate Firebase Auth state listeners.
