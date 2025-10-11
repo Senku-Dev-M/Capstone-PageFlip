@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 
 import { useBookStore } from "@/store/useBookStore";
 import type { Book } from "@/types/book";
 import { fetchBooks } from "@/lib/booksApi";
+import { enrichBooksWithLoanStatus } from "@/lib/bookLoans";
+import { useUserStore } from "@/store/useUserStore";
 
 import BookGrid from "./BookGrid";
 import CatalogFilters from "./CatalogFilters";
@@ -22,12 +24,27 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
   const setPage = useBookStore((state) => state.setPage);
   const setIsLoading = useBookStore((state) => state.setIsLoading);
 
+  const user = useUserStore((state) => state.user);
+
   const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
   const hasInitializedSearch = useRef(false);
 
+  // Memoize handlers and functions
+  const handleSetBooks = useCallback((newBooks: Book[]) => {
+    setBooks(newBooks);
+  }, [setBooks]);
+
+  const handleSetPage = useCallback((page: number) => {
+    setPage(page);
+  }, [setPage]);
+
+  const handleSetIsLoading = useCallback((loading: boolean) => {
+    setIsLoading(loading);
+  }, [setIsLoading]);
+
   useEffect(() => {
-    setBooks(initialBooks);
-  }, [initialBooks, setBooks]);
+    handleSetBooks(initialBooks);
+  }, [initialBooks, handleSetBooks]);
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -49,7 +66,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
     const searchQuery = debouncedSearch.trim() || undefined;
 
     const loadBooks = async () => {
-      setIsLoading(true);
+      handleSetIsLoading(true);
 
       try {
         const fetchedBooks = await fetchBooks({
@@ -58,7 +75,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
         });
 
         if (isActive) {
-          setBooks(fetchedBooks);
+          handleSetBooks(fetchedBooks);
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
@@ -68,7 +85,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
         console.error("Failed to fetch books", error);
       } finally {
         if (isActive) {
-          setIsLoading(false);
+          handleSetIsLoading(false);
         }
       }
     };
@@ -79,7 +96,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
       isActive = false;
       controller.abort();
     };
-  }, [debouncedSearch, setBooks, setIsLoading]);
+  }, [debouncedSearch, handleSetBooks, handleSetIsLoading]);
 
   const filteredBooks = useMemo(() => {
     const searchTerm = filters.search.trim().toLowerCase();
@@ -121,6 +138,11 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
     return sorted;
   }, [filteredBooks, filters.sort]);
 
+  // Enrich books with loan status
+  const enrichedBooks = useMemo(() => {
+    return enrichBooksWithLoanStatus(sortedBooks, user?.id || null);
+  }, [sortedBooks, user?.id]);
+
   const totalPages = Math.max(
     1,
     Math.ceil(sortedBooks.length / pagination.pageSize),
@@ -128,13 +150,13 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
 
   useEffect(() => {
     if (pagination.currentPage > totalPages) {
-      setPage(totalPages);
+      handleSetPage(totalPages);
     }
-  }, [pagination.currentPage, setPage, totalPages]);
+  }, [pagination.currentPage, totalPages, handleSetPage]);
 
   const currentPage = Math.min(pagination.currentPage, totalPages);
   const startIndex = (currentPage - 1) * pagination.pageSize;
-  const paginatedBooks = sortedBooks.slice(
+  const paginatedBooks = enrichedBooks.slice(
     startIndex,
     startIndex + pagination.pageSize,
   );
@@ -145,13 +167,13 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
     startIndex + pagination.pageSize,
   );
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     if (page < 1 || page > totalPages) {
       return;
     }
 
-    setPage(page);
-  };
+    handleSetPage(page);
+  }, [totalPages, handleSetPage]);
 
   return (
     <div className="space-y-6">

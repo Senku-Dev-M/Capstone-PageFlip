@@ -5,10 +5,6 @@ import { useState } from "react";
 import LoginDialog from "@/components/LoginDialog";
 import RegisterDialog from "@/components/RegisterDialog";
 
-export const metadata = {
-  title: "Authentication Preview",
-};
-
 const loginTriggerClasses =
   "relative inline-flex items-center justify-center rounded-full border border-teal-500/60 bg-slate-950/80 px-5 py-2 text-xs font-semibold uppercase tracking-[0.4em] text-teal-200 shadow-[0_0_18px_rgba(34,211,238,0.35)] transition hover:border-teal-400 hover:text-teal-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
 

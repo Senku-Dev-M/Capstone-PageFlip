@@ -3,6 +3,9 @@ import Link from "next/link";
 
 import type { Metadata } from "next";
 
+import BookLoanActions from "@/components/BookLoanActions";
+import type { Book } from "@/types/book";
+
 const OPEN_LIBRARY_BASE = "https://openlibrary.org";
 
 function extractDescription(
@@ -141,17 +144,39 @@ export default async function BookPage({ params }: BookPageProps) {
       ? "shadow-[0_0_25px_rgba(20,184,166,0.45)]"
       : "shadow-[0_0_25px_rgba(250,204,21,0.45)]";
 
-  const ctaClasses =
-    status === "available"
-      ? "bg-teal-500/20 text-teal-200 hover:bg-teal-500/30 border-teal-500/50 shadow-[0_0_25px_rgba(20,184,166,0.35)]"
-      : "bg-amber-400/20 text-amber-200 hover:bg-amber-400/30 border-amber-300/60 shadow-[0_0_25px_rgba(250,204,21,0.35)]";
+  const primaryAuthor = authorNames[0] ?? "Unknown Author";
 
-  const actionLabel = status === "available" ? "Acquire Loan" : "Request Hold";
+  const publicationYear = (() => {
+    const source = work?.first_publish_date ?? work?.created?.value;
+    if (!source) {
+      return undefined;
+    }
+
+    const match = source.match(/\d{4}/);
+    if (!match) {
+      return undefined;
+    }
+
+    const yearNumber = Number.parseInt(match[0], 10);
+    return Number.isNaN(yearNumber) ? undefined : yearNumber;
+  })();
+
+  const loanReadyBook: Book = {
+    id,
+    title: work?.title ?? `Tome #${id}`,
+    author: primaryAuthor,
+    cover: coverUrl ?? undefined,
+    description,
+    year: publicationYear,
+    format: "Digital",
+    tags: subjects.length ? subjects : undefined,
+    status,
+  };
 
   return (
     <section className="mx-auto max-w-5xl space-y-8">
       <Link
-        href="/catalog"
+        href="/"
         className="inline-flex items-center text-sm font-semibold text-teal-300 transition hover:text-teal-200"
       >
         &larr; Back to Catalog
@@ -213,12 +238,7 @@ export default async function BookPage({ params }: BookPageProps) {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <button
-            type="button"
-            className={`w-full max-w-md rounded-full border px-6 py-3 text-base font-semibold uppercase tracking-[0.25em] transition ${ctaClasses}`}
-          >
-            {actionLabel}
-          </button>
+          <BookLoanActions book={loanReadyBook} remoteStatus={status} />
         </div>
       </div>
     </section>
