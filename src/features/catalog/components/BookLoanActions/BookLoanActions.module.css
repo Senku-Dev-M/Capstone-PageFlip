@@ -5,51 +5,47 @@
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.9rem;
-  color: #94a3b8;
 }
 
 .button {
   width: 100%;
   max-width: 32rem;
-  border-radius: 999px;
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 0.85rem;
+  border: 1px solid rgba(20, 184, 166, 0.25);
   padding: 0.75rem 1.5rem;
   font-size: 0.9rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.25em;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  background: rgba(15, 23, 42, 0.6);
-  color: #e2e8f0;
+  background: rgba(43, 53, 70, 0.85);
+  color: var(--primary-text);
 }
 
 .return {
-  border-color: rgba(236, 72, 153, 0.6);
-  background: rgba(236, 72, 153, 0.15);
-  color: #f9a8d4;
+  border-color: rgba(236, 72, 153, 0.4);
+  background: rgba(236, 72, 153, 0.18);
+  color: #ffd9ec;
 }
 
 .return:hover:not(.disabled) {
-  background: rgba(236, 72, 153, 0.25);
-  color: #fce7f3;
+  background: rgba(236, 72, 153, 0.28);
 }
 
 .borrow {
-  border-color: rgba(20, 184, 166, 0.6);
+  border-color: rgba(20, 184, 166, 0.45);
   background: rgba(20, 184, 166, 0.2);
-  color: #99f6e4;
+  color: var(--accent-color);
 }
 
 .borrow:hover:not(.disabled) {
-  background: rgba(20, 184, 166, 0.3);
-  color: #ccfbf1;
+  background: rgba(20, 184, 166, 0.28);
 }
 
 .unavailable {
-  border-color: rgba(251, 191, 36, 0.6);
-  background: rgba(251, 191, 36, 0.15);
-  color: #fde68a;
+  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(148, 163, 184, 0.18);
+  color: var(--secondary-text);
 }
 
 .content {
@@ -76,14 +72,6 @@
 .disabled:hover {
   background: inherit;
   color: inherit;
-}
-
-.helper {
-  text-align: center;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: #64748b;
 }
 
 @keyframes spin {

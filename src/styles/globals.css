@@ -1,13 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
 :root {
   color-scheme: dark;
-  --pageflip-neon: #00f5ff;
-  --pageflip-magenta: #e11dff;
-  --pageflip-amber: #f59e0b;
-  --pageflip-bg: #020617;
-  --pageflip-card: #0f172a;
-  --pageflip-border: rgba(56, 189, 248, 0.25);
-  --pageflip-scrollbar: rgba(56, 189, 248, 0.5);
-  font-family: "Space Grotesk", ui-sans-serif, system-ui;
+  --accent-color: #14b8a6;
+  --accent-color-strong: #0d9488;
+  --danger-color: #ec4899;
+  --danger-color-strong: #db2777;
+  --bg-color: #1a202c;
+  --surface-color: #1a202c;
+  --surface-elevated: #303d52;
+  --primary-text: #e2e8f0;
+  --secondary-text: #94a3b8;
+  --muted-text: #64748b;
+  --divider-color: rgba(148, 163, 184, 0.2);
+  --input-border: rgba(148, 163, 184, 0.3);
+  --scrollbar-color: rgba(20, 184, 166, 0.4);
+  font-family: "Inter", ui-sans-serif, system-ui;
 }
 
 * {
@@ -23,9 +31,9 @@ body {
 
 body {
   margin: 0;
-  color: #f1f5f9;
-  background: linear-gradient(180deg, #000000 0%, #020617 50%, #000000 100%);
-  font-family: "Space Grotesk", ui-sans-serif, system-ui;
+  color: var(--primary-text);
+  background: var(--bg-color);
+  font-family: "Inter", ui-sans-serif, system-ui;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -43,8 +51,8 @@ button {
 }
 
 ::selection {
-  background: rgba(56, 189, 248, 0.4);
-  color: #f8fafc;
+  background: rgba(20, 184, 166, 0.35);
+  color: var(--primary-text);
 }
 
 ::-webkit-scrollbar {
@@ -53,77 +61,69 @@ button {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(2, 6, 23, 0.8);
+  background: rgba(17, 24, 39, 0.65);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--pageflip-scrollbar);
+  background: var(--scrollbar-color);
   border-radius: 9999px;
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 18px rgba(20, 184, 166, 0.25);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(14, 165, 233, 0.8);
-}
-
-.neon-divider {
-  position: relative;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.8), transparent);
-}
-
-.glow-ring {
-  box-shadow: 0 0 35px rgba(56, 189, 248, 0.35), 0 0 12px rgba(225, 29, 255, 0.25);
+  background: rgba(20, 184, 166, 0.6);
 }
 
 .cyberpunk-card {
-  background: linear-gradient(145deg, rgba(2, 6, 23, 0.9), rgba(15, 23, 42, 0.9));
-  border: 1px solid var(--pageflip-border);
-  box-shadow: 0 0 45px rgba(14, 165, 233, 0.15);
-  backdrop-filter: blur(12px);
+  background: var(--surface-color);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 14px 28px rgba(8, 11, 19, 0.45);
 }
 
 .cyber-input,
 .cyber-select {
   width: 100%;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  background: rgba(2, 6, 23, 0.7);
+  border-radius: 0.65rem;
+  border: 1px solid var(--input-border);
+  background: rgba(43, 53, 70, 0.85);
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
-  color: #f8fafc;
+  color: var(--primary-text);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 0 25px rgba(56, 189, 248, 0.12);
-  backdrop-filter: blur(16px);
+  box-shadow: none;
 }
 
 .cyber-input::placeholder {
-  color: rgba(148, 163, 184, 0.8);
+  color: var(--secondary-text);
 }
 
 .cyber-input:focus,
 .cyber-select:focus {
-  border-color: rgba(56, 189, 248, 0.5);
-  box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);
+  border-color: rgba(20, 184, 166, 0.6);
+  box-shadow: 0 0 0 1px rgba(20, 184, 166, 0.35);
   outline: none;
 }
 
 .cyber-select {
   appearance: none;
   padding-right: 3rem;
-  background-image: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(14, 165, 233, 0.15)),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2300f5ff' d='M5 6 0 0h10z'/%3E%3C/svg%3E");
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23e2e8f0' d='M5 6 0 0h10z'/%3E%3C/svg%3E");
   background-position: left top, right 1rem center;
   background-repeat: no-repeat;
   background-size: cover, 0.75rem 0.5rem;
+  color: var(--primary-text);
 }
 
 .cyber-select option {
-  color: #020617;
+  color: var(--primary-text);
+  background-color: var(--surface-color);
 }
 
-.text-glow {
-  text-shadow: 0 0 18px rgba(20, 184, 166, 0.65);
+.cyber-select option:checked,
+.cyber-select option:hover {
+  background-color: var(--surface-elevated);
+  color: var(--accent-color);
 }
 
 .sr-only {

@@ -90,13 +90,6 @@ export default function RegisterDialog({
   return (
     <div className={styles.overlay}>
       <div className={styles.dialog}>
-        <div className={styles.aura}>
-          <div className={styles.auraMagenta} />
-          <div className={styles.auraCyan} />
-          <div className={styles.auraBeam} />
-          <div className={styles.auraColumn} />
-        </div>
-
         <button
           type="button"
           onClick={handleClose}

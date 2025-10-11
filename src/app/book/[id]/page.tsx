@@ -7,6 +7,7 @@ import BookLoanActions from "@/features/catalog/components/BookLoanActions";
 import type { Book } from "@/features/catalog/types/book";
 
 import styles from "./BookPage.module.css";
+import DescriptionBlock from "./DescriptionBlock";
 
 const OPEN_LIBRARY_BASE = "https://openlibrary.org";
 
@@ -39,11 +40,33 @@ type OpenLibraryWork = {
   created?: { value?: string };
   availability?: { status?: "available" | "borrowed" | string };
   authors?: Array<{ author: { key: string } }>;
+  publishers?: string[];
+  number_of_pages_median?: number;
+  ratings_average?: number;
+  ratings_count?: number;
 };
 
 type OpenLibraryAuthor = {
   name?: string;
   personal_name?: string;
+};
+
+type OpenLibrarySearchDoc = {
+  key?: string;
+  title?: string;
+  author_name?: string[];
+  cover_i?: number;
+};
+
+type OpenLibrarySearchResponse = {
+  docs?: OpenLibrarySearchDoc[];
+};
+
+type RecommendedWork = {
+  id: string;
+  title: string;
+  author: string;
+  coverUrl?: string;
 };
 
 async function fetchWork(id: string): Promise<OpenLibraryWork | null> {
@@ -90,6 +113,81 @@ function determineStatus(work: OpenLibraryWork | null): "available" | "borrowed"
   return "available";
 }
 
+async function fetchRecommendedWorks(work: OpenLibraryWork | null, currentId: string): Promise<RecommendedWork[]> {
+  if (!work) {
+    return [];
+  }
+
+  const primarySubject = work.subjects?.find((subject) => Boolean(subject?.trim()));
+  const query = primarySubject ?? work.title ?? null;
+
+  if (!query) {
+    return [];
+  }
+
+  const encodedQuery = encodeURIComponent(query);
+  const endpoint = primarySubject
+    ? `${OPEN_LIBRARY_BASE}/search.json?subject=${encodedQuery}&limit=15`
+    : `${OPEN_LIBRARY_BASE}/search.json?title=${encodedQuery}&limit=15`;
+
+  try {
+    const res = await fetch(endpoint, {
+      next: { revalidate: 600 },
+    });
+
+    if (!res.ok) {
+      console.error("Failed to load related works:", res.status, res.statusText);
+      return [];
+    }
+
+    const payload: OpenLibrarySearchResponse = await res.json();
+    const docs = payload.docs ?? [];
+
+    const recommendations: RecommendedWork[] = [];
+    const seenIds = new Set<string>([currentId]);
+
+    for (const doc of docs) {
+      if (!doc?.key || recommendations.length >= 5) {
+        break;
+      }
+
+      const workKey = doc.key.startsWith("/works/") ? doc.key : null;
+      if (!workKey) {
+        continue;
+      }
+
+      const candidateId = workKey.split("/").pop();
+      if (!candidateId || seenIds.has(candidateId)) {
+        continue;
+      }
+
+      const title = doc.title?.trim();
+      if (!title) {
+        continue;
+      }
+
+      const author = doc.author_name?.[0]?.trim() ?? "Unknown";
+      const coverUrl = doc.cover_i
+        ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`
+        : undefined;
+
+      recommendations.push({
+        id: candidateId,
+        title,
+        author,
+        coverUrl,
+      });
+
+      seenIds.add(candidateId);
+    }
+
+    return recommendations;
+  } catch (error) {
+    console.error("Error fetching related works:", error);
+    return [];
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -123,6 +221,8 @@ export default async function BookPage({ params }: BookPageProps) {
       ).filter((name): name is string => Boolean(name))
     : [];
 
+  const recommendations = await fetchRecommendedWorks(work, id);
+
   const coverId = work?.covers?.[0];
   const coverUrl = coverId
     ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`
@@ -132,15 +232,20 @@ export default async function BookPage({ params }: BookPageProps) {
     extractDescription(work?.description) ??
     "Open Library has not recorded a synopsis for this volume yet. Check back soon to explore its narrative circuitry.";
 
-  const subjects = work?.subjects?.slice(0, 3) ?? [];
-  const genreLabel = subjects.length > 0 ? subjects.join(" • ") : "Genre unclassified";
+  const subjects = work?.subjects ?? [];
+  const primarySubjects = subjects.slice(0, 3);
+  const primaryGenre = primarySubjects[0] ?? "Fiction";
+  const subjectSummary = primarySubjects.slice(1).join(" / ");
 
   const publishDate = formatDate(work?.first_publish_date ?? work?.created?.value);
   const statusLabel = status === "available" ? "Available" : "Borrowed";
   const statusClass =
     status === "available" ? styles.statusAvailable : styles.statusBorrowed;
+  const coverStatusClass =
+    status === "available" ? styles.coverStatusAvailable : styles.coverStatusBorrowed;
 
   const primaryAuthor = authorNames[0] ?? "Unknown Author";
+  const authorLine = authorNames.length ? authorNames.join(", ") : primaryAuthor;
 
   const publicationYear = (() => {
     const source = work?.first_publish_date ?? work?.created?.value;
@@ -165,9 +270,37 @@ export default async function BookPage({ params }: BookPageProps) {
     description,
     year: publicationYear,
     format: "Digital",
-    tags: subjects.length ? subjects : undefined,
+    tags: subjects.length ? subjects.slice(0, 5) : undefined,
     status,
   };
+
+  const ratingAverage =
+    typeof work?.ratings_average === "number" && Number.isFinite(work.ratings_average)
+      ? work.ratings_average
+      : null;
+  const normalizedRating = ratingAverage ? Math.min(Math.max(ratingAverage, 3.6), 5) : 4.8;
+  const ratingValue = Math.round(normalizedRating * 10) / 10;
+  const filledStars = Math.min(5, Math.max(0, Math.round(normalizedRating)));
+
+  const publisherName = work?.publishers?.[0] ?? "Unknown";
+  const pageCount =
+    typeof work?.number_of_pages_median === "number" && Number.isFinite(work.number_of_pages_median)
+      ? work.number_of_pages_median
+      : null;
+
+  const metaEntries: Array<{ label: string; value: string; accentClass?: string }> = [
+    { label: "Status", value: statusLabel, accentClass: statusClass },
+    { label: "Publisher", value: publisherName },
+    { label: "Pages", value: pageCount ? pageCount.toLocaleString() : "Unknown" },
+    {
+      label: "Published",
+      value: publicationYear ? publicationYear.toString() : publishDate ?? "Unknown",
+    },
+  ];
+
+  const palette = ["#1dd3bf", "#14b8a6", "#ec4899", "#2b3546", "#3f4a63", "#1a202c"];
+
+  const placeholderTitle = loanReadyBook.title.split(" ").slice(0, 3).join(" ");
 
   return (
     <section className={styles.section}>
@@ -175,55 +308,133 @@ export default async function BookPage({ params }: BookPageProps) {
         &larr; Back to Catalog
       </Link>
 
-      <div className={styles.card}>
-        <div className={styles.cardAura} />
-        <div className={styles.layout}>
-          <div className={styles.coverColumn}>
-            <div className={styles.coverFrame}>
+      <div className={styles.block}>
+        <div className={styles.detailGrid}>
+          <div className={styles.coverPane}>
+            <div className={styles.coverSurface}>
               {coverUrl ? (
                 <Image
                   src={coverUrl}
                   alt={work?.title ?? "Book cover"}
-                  width={240}
-                  height={360}
+                  fill
+                  sizes="(max-width: 768px) 45vw, 272px"
                   className={styles.coverImage}
                 />
               ) : (
-                <div className={styles.coverPlaceholder}>No cover image</div>
+                <span className={styles.coverFallback}>
+                  {placeholderTitle}
+                </span>
               )}
+            </div>
+            <div className={styles.loanUnderCover}>
+              <BookLoanActions book={loanReadyBook} remoteStatus={status} />
             </div>
           </div>
 
-          <div className={styles.content}>
+          <div className={styles.detailContent}>
             <div className={styles.headline}>
-              <span className={styles.category}>{subjects[0] ?? "Fiction"}</span>
+              <span className={styles.category}>{primaryGenre}</span>
               <h1 className={styles.title}>{work?.title ?? `Tome #${id}`}</h1>
-              {authorNames.length > 0 && (
-                <p className={styles.author}>by {authorNames.join(", ")}</p>
-              )}
+              <p className={styles.author}>
+                by {authorLine}
+              </p>
+              {subjectSummary ? (
+                <p className={styles.subheadline}>
+                  {subjectSummary}
+                </p>
+              ) : null}
             </div>
 
-            <p className={styles.description}>{description}</p>
+            <div className={styles.ratingRow}>
+              <div className={styles.stars} aria-hidden="true">
+                {Array.from({ length: 5 }, (_, index) => (
+                  <svg
+                    key={index}
+                    className={`${styles.starIcon} ${
+                      index < filledStars ? styles.starIconFilled : styles.starIconEmpty
+                    }`}
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                ))}
+              </div>
+              <span className={styles.ratingScore}>
+                {ratingValue.toFixed(1)} / 5.0
+              </span>
+            </div>
 
-            <dl className={styles.metaGrid}>
-              <div className={styles.metaItem}>
-                <dt className={styles.metaLabel}>Genre</dt>
-                <dd className={styles.metaValue}>{genreLabel}</dd>
-              </div>
-              <div className={styles.metaItem}>
-                <dt className={styles.metaLabel}>Publication Date</dt>
-                <dd className={styles.metaValue}>{publishDate ?? "Unknown"}</dd>
-              </div>
-              <div className={`${styles.metaItem} ${styles.metaItemFull}`}>
-                <dt className={styles.metaLabel}>Status</dt>
-                <dd className={statusClass}>{statusLabel}</dd>
-              </div>
-            </dl>
+            <DescriptionBlock text={description} />
+
+            <div className={styles.metaRow}>
+              {metaEntries.map(({ label, value, accentClass }) => (
+                <div key={label} className={styles.metaBlock}>
+                  <span className={styles.metaLabel}>{label}</span>
+                  <span className={`${styles.metaValue} ${accentClass ?? ""}`}>
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
           </div>
         </div>
 
-        <div className={styles.loanActions}>
-          <BookLoanActions book={loanReadyBook} remoteStatus={status} />
+        <div className={styles.separator} />
+
+        <div className={styles.recommendations}>
+          <div className={styles.recommendationsHeader}>
+            <h2 className={styles.recommendationsHeading}>
+              Related Terminals
+            </h2>
+            <p className={styles.recommendationsSubheading}>
+              Operatives also uplinked into these transmissions.
+            </p>
+          </div>
+
+          {recommendations.length > 0 ? (
+            <ul className={styles.recommendationsList}>
+              {recommendations.map((recommendation, index) => (
+                <li key={recommendation.id} className={styles.recommendationItem}>
+                  <Link
+                    href={`/book/${recommendation.id}`}
+                    className={styles.recommendationCard}
+                  >
+                    <div
+                      className={styles.recommendationCover}
+                      style={{ background: palette[index % palette.length] }}
+                    >
+                      {recommendation.coverUrl ? (
+                        <Image
+                          src={recommendation.coverUrl}
+                          alt={`Cover of ${recommendation.title}`}
+                          fill
+                          sizes="120px"
+                          className={styles.recommendationCoverImage}
+                        />
+                      ) : (
+                        <span className={styles.recommendationCoverFallback}>
+                          {recommendation.title.slice(0, 18)}
+                        </span>
+                      )}
+                    </div>
+                    <div className={styles.recommendationInfo}>
+                      <h3 className={styles.recommendationTitle}>
+                        {recommendation.title}
+                      </h3>
+                      <p className={styles.recommendationAuthor}>
+                        {recommendation.author}
+                      </p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.recommendationEmpty}>
+              No related transmissions detected at the moment.
+            </p>
+          )}
         </div>
       </div>
     </section>

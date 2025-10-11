@@ -8,7 +8,7 @@ import { formatLoanHistory } from "@/features/catalog/utils/bookLoans";
 
 import styles from "./ActiveLoansPage.module.css";
 
-const FALLBACK_COLORS = ["#fb7185", "#34d399", "#60a5fa", "#fbbf24", "#a78bfa", "#38bdf8"];
+const FALLBACK_COLORS = ["#1dd3bf", "#14b8a6", "#ec4899", "#2b3546", "#3f4a63", "#1a202c"];
 
 export default function ActiveLoansPage() {
   const { userLoans, returnBook, isLoading } = useBookLoans();

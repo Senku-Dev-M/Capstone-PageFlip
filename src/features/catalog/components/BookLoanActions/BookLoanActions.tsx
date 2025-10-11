@@ -32,22 +32,6 @@ export default function BookLoanActions({ book, remoteStatus }: BookLoanActionsP
 
   const canBorrow = !isBorrowed && remoteStatus === "available";
 
-  const helperText = useMemo(() => {
-    if (isBorrowedByUser) {
-      return "You currently have this transmission checked out.";
-    }
-    if (isBorrowed) {
-      return "Another operative is uplinking this tome right now.";
-    }
-    if (remoteStatus === "borrowed") {
-      return "Open Library flags this volume as unavailable at the moment.";
-    }
-    if (!user) {
-      return "Log in to initiate the loan protocol.";
-    }
-    return "Secure this volume to add it to your neural shelf.";
-  }, [isBorrowed, isBorrowedByUser, remoteStatus, user]);
-
   const actionLabel = useMemo(() => {
     if (isBorrowedByUser) {
       return "Return Book";
@@ -58,7 +42,7 @@ export default function BookLoanActions({ book, remoteStatus }: BookLoanActionsP
     return "Acquire Loan";
   }, [canBorrow, isBorrowedByUser, remoteStatus]);
 
-  const actionDisabled = isLoading || (!isBorrowedByUser && !canBorrow);
+  const actionDisabled = isLoading || (!isBorrowedByUser && (!canBorrow || !user));
 
   const toneClass = isBorrowedByUser
     ? styles.return
@@ -98,9 +82,6 @@ export default function BookLoanActions({ book, remoteStatus }: BookLoanActionsP
           <span>{actionLabel}</span>
         </span>
       </button>
-      <p className={styles.helper}>
-        {helperText}
-      </p>
     </div>
   );
 }

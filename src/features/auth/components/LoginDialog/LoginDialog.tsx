@@ -76,12 +76,6 @@ export default function LoginDialog({
   return (
     <div className={styles.overlay}>
       <div className={styles.dialog}>
-        <div className={styles.aura}>
-          <div className={styles.auraTeal} />
-          <div className={styles.auraCyan} />
-          <div className={styles.auraBeam} />
-        </div>
-
         <button
           type="button"
           onClick={handleClose}

@@ -9,8 +9,8 @@
   overflow: hidden;
   padding: 4rem 1.5rem;
   text-align: center;
-  color: #f8fafc;
-  background: #020617;
+  color: var(--primary-text);
+  background: var(--bg-color);
 }
 
 .backdrop {
@@ -32,7 +32,7 @@
   top: 25%;
   width: 20rem;
   height: 20rem;
-  background: rgba(45, 212, 191, 0.2);
+  background: rgba(20, 184, 166, 0.18);
 }
 
 .glowFuchsia {
@@ -40,13 +40,13 @@
   bottom: 4rem;
   width: 18rem;
   height: 18rem;
-  background: rgba(217, 70, 239, 0.2);
+  background: rgba(236, 72, 153, 0.18);
 }
 
 .radial {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at top, rgba(56, 189, 248, 0.08), transparent 55%);
+  background: radial-gradient(circle at top, rgba(20, 184, 166, 0.12), transparent 60%);
 }
 
 .hero {
@@ -62,21 +62,21 @@
   font-size: 0.75rem;
   letter-spacing: 0.6em;
   text-transform: uppercase;
-  color: rgba(94, 234, 212, 0.8);
+  color: rgba(20, 184, 166, 0.7);
 }
 
 .heroTitle {
   margin: 0;
   font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--primary-text);
 }
 
 .heroDescription {
   margin: 0 auto;
   font-size: 0.9rem;
   line-height: 1.6;
-  color: #94a3b8;
+  color: var(--secondary-text);
 }
 
 .panels {
@@ -95,27 +95,25 @@
   gap: 0.75rem;
   border-radius: 1.5rem;
   padding: 1.5rem;
-  background: rgba(2, 6, 23, 0.8);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 0 45px rgba(45, 212, 191, 0.2);
-  border: 1px solid rgba(45, 212, 191, 0.3);
+  background: var(--surface-color);
+  box-shadow: 0 18px 30px rgba(10, 15, 26, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   min-width: 18rem;
 }
 
 .panel.fuchsia {
-  box-shadow: 0 0 45px rgba(217, 70, 239, 0.2);
-  border-color: rgba(217, 70, 239, 0.3);
+  border-color: rgba(236, 72, 153, 0.25);
 }
 
 .panelKicker {
   font-size: 0.75rem;
   letter-spacing: 0.45em;
   text-transform: uppercase;
-  color: rgba(125, 211, 252, 0.8);
+  color: var(--secondary-text);
 }
 
 .panelKicker.fuchsia {
-  color: rgba(240, 171, 252, 0.8);
+  color: var(--danger-color);
 }
 
 .panelButton {
@@ -131,28 +129,27 @@
   letter-spacing: 0.4em;
   transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   border: 1px solid transparent;
-  background: rgba(2, 6, 23, 0.8);
-  box-shadow: 0 0 18px rgba(34, 211, 238, 0.35);
-  color: #99f6e4;
+  background: rgba(20, 184, 166, 0.15);
+  box-shadow: none;
+  color: var(--accent-color);
 }
 
 .panelButton:hover,
 .panelButton:focus-visible {
-  border-color: rgba(45, 212, 191, 0.6);
-  color: #ccfbf1;
+  border-color: rgba(20, 184, 166, 0.4);
+  color: var(--accent-color-strong);
   outline: none;
 }
 
 .panelButton.fuchsia {
-  border-color: rgba(217, 70, 239, 0.6);
-  box-shadow: 0 0 22px rgba(217, 70, 239, 0.35);
-  color: #f5d0fe;
+  background: rgba(236, 72, 153, 0.15);
+  color: var(--danger-color);
 }
 
 .panelButton.fuchsia:hover,
 .panelButton.fuchsia:focus-visible {
-  color: #fce7f3;
-  border-color: rgba(217, 70, 239, 0.7);
+  color: #fbbcd4;
+  border-color: rgba(236, 72, 153, 0.4);
 }
 
 @media (min-width: 768px) {
