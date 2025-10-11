@@ -3,8 +3,8 @@ import Link from "next/link";
 
 import type { Metadata } from "next";
 
-import BookLoanActions from "@/components/BookLoanActions";
-import type { Book } from "@/types/book";
+import BookLoanActions from "@/features/catalog/components/BookLoanActions";
+import type { Book } from "@/features/catalog/types/book";
 
 import styles from "./BookPage.module.css";
 

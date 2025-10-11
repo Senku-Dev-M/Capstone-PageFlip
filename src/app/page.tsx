@@ -1,6 +1,6 @@
-import CatalogClient from "@/components/CatalogClient";
-import { fetchBooks } from "@/lib/booksApi";
-import type { Book } from "@/types/book";
+import CatalogClient from "@/features/catalog/components/CatalogClient";
+import { fetchBooks } from "@/features/catalog/api/booksApi";
+import type { Book } from "@/features/catalog/types/book";
 
 import styles from "./page.module.css";
 

@@ -20,6 +20,17 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Project Structure
+
+The source code is organized into feature-oriented folders to make related UI, state, and data logic easy to find:
+
+- `src/features/auth` – Authentication dialogs, hooks, stores, and Firebase helpers.
+- `src/features/catalog` – Catalog UI, state stores, hooks, API helpers, and domain types.
+- `src/shared` – Layout components and cross-cutting utilities shared across features.
+- `src/core` – Framework-agnostic singletons such as the Firebase client.
+
+Each component folder co-locates its styles and exports an `index.ts` file so imports remain tidy across the app.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
