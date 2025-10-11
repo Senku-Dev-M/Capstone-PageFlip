@@ -6,7 +6,8 @@ import type { Book } from "@/types/book";
 import { useBookLoans } from "@/hooks/useBookLoans";
 import { useBookLoansStore } from "@/store/useBookLoansStore";
 import { useUserStore } from "@/store/useUserStore";
-import { cn } from "@/lib/utils";
+
+import styles from "./BookLoanActions.module.css";
 
 type BookLoanActionsProps = {
   book: Book;
@@ -59,15 +60,15 @@ export default function BookLoanActions({ book, remoteStatus }: BookLoanActionsP
 
   const actionDisabled = isLoading || (!isBorrowedByUser && !canBorrow);
 
-  const buttonClasses = cn(
-    "w-full max-w-md rounded-full border px-6 py-3 text-base font-semibold uppercase tracking-[0.25em] transition",
-    isBorrowedByUser
-      ? "border-pink-500/60 bg-pink-500/15 text-pink-200 hover:bg-pink-500/25 hover:text-pink-100"
-      : canBorrow
-        ? "border-teal-500/60 bg-teal-500/20 text-teal-200 hover:bg-teal-500/30 hover:text-teal-100"
-        : "border-amber-400/60 bg-amber-400/15 text-amber-200",
-    actionDisabled ? "cursor-not-allowed opacity-60 hover:bg-inherit hover:text-inherit" : null,
-  );
+  const toneClass = isBorrowedByUser
+    ? styles.return
+    : canBorrow
+      ? styles.borrow
+      : styles.unavailable;
+  const buttonClasses = [styles.button, toneClass];
+  if (actionDisabled) {
+    buttonClasses.push(styles.disabled);
+  }
 
   const handleBorrow = async () => {
     await borrowBook(book);
@@ -80,21 +81,21 @@ export default function BookLoanActions({ book, remoteStatus }: BookLoanActionsP
   const onClick = isBorrowedByUser ? handleReturn : canBorrow ? handleBorrow : undefined;
 
   return (
-    <div className="flex w-full max-w-lg flex-col items-center gap-3 text-sm text-slate-400">
+    <div className={styles.container}>
       <button
         type="button"
-        className={buttonClasses}
+        className={buttonClasses.join(" ")}
         onClick={onClick}
         disabled={actionDisabled}
       >
-        <span className="flex items-center justify-center gap-3">
+        <span className={styles.content}>
           {isLoading ? (
-            <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            <span className={styles.spinner} />
           ) : null}
           <span>{actionLabel}</span>
         </span>
       </button>
-      <p className="text-center text-xs uppercase tracking-[0.25em] text-slate-500">
+      <p className={styles.helper}>
         {helperText}
       </p>
     </div>

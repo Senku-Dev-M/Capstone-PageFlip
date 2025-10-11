@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import type { Book } from "@/types/book";
 import BookCard from "./BookCard";
 
+import styles from "./BookGrid.module.css";
+
 type BookGridProps = {
   books: Book[];
   emptyState?: ReactNode;
@@ -9,15 +11,11 @@ type BookGridProps = {
 
 export default function BookGrid({ books, emptyState }: BookGridProps) {
   if (!books.length) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-cyan-500/10 bg-slate-950/60 p-10 text-center text-slate-500">
-        {emptyState ?? <p>No transmissions detected. Try adjusting your filters.</p>}
-      </div>
-    );
+    return <div className={styles.emptyState}>{emptyState ?? <p>No transmissions detected. Try adjusting your filters.</p>}</div>;
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className={styles.grid}>
       {books.map((book) => (
         <BookCard
           key={book.id}

@@ -6,6 +6,8 @@ import type { Metadata } from "next";
 import BookLoanActions from "@/components/BookLoanActions";
 import type { Book } from "@/types/book";
 
+import styles from "./BookPage.module.css";
+
 const OPEN_LIBRARY_BASE = "https://openlibrary.org";
 
 function extractDescription(
@@ -135,14 +137,8 @@ export default async function BookPage({ params }: BookPageProps) {
 
   const publishDate = formatDate(work?.first_publish_date ?? work?.created?.value);
   const statusLabel = status === "available" ? "Available" : "Borrowed";
-  const statusColor =
-    status === "available"
-      ? "text-teal-300"
-      : "text-amber-300";
-  const statusGlow =
-    status === "available"
-      ? "shadow-[0_0_25px_rgba(20,184,166,0.45)]"
-      : "shadow-[0_0_25px_rgba(250,204,21,0.45)]";
+  const statusClass =
+    status === "available" ? styles.statusAvailable : styles.statusBorrowed;
 
   const primaryAuthor = authorNames[0] ?? "Unknown Author";
 
@@ -174,70 +170,59 @@ export default async function BookPage({ params }: BookPageProps) {
   };
 
   return (
-    <section className="mx-auto max-w-5xl space-y-8">
-      <Link
-        href="/"
-        className="inline-flex items-center text-sm font-semibold text-teal-300 transition hover:text-teal-200"
-      >
+    <section className={styles.section}>
+      <Link href="/" className={styles.backLink}>
         &larr; Back to Catalog
       </Link>
 
-      <div className="relative overflow-hidden rounded-3xl border border-cyan-500/20 bg-slate-950/80 p-8 shadow-[0_0_45px_rgba(56,189,248,0.15)]">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.15),transparent_45%),radial-gradient(circle_at_bottom_right,rgba(236,72,153,0.1),transparent_45%)]" />
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,240px)_1fr]">
-          <div className="flex flex-col items-center justify-start">
-            <div className="relative w-full max-w-[240px] overflow-hidden rounded-2xl border border-cyan-500/30 bg-slate-900/70 p-2 shadow-[0_0_35px_rgba(20,184,166,0.2)]">
+      <div className={styles.card}>
+        <div className={styles.cardAura} />
+        <div className={styles.layout}>
+          <div className={styles.coverColumn}>
+            <div className={styles.coverFrame}>
               {coverUrl ? (
                 <Image
                   src={coverUrl}
                   alt={work?.title ?? "Book cover"}
                   width={240}
                   height={360}
-                  className="h-full w-full rounded-xl object-cover"
+                  className={styles.coverImage}
                 />
               ) : (
-                <div className="flex h-full min-h-[320px] w-full items-center justify-center rounded-xl bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 text-center text-sm text-slate-400">
-                  No cover image
-                </div>
+                <div className={styles.coverPlaceholder}>No cover image</div>
               )}
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <span className="text-xs uppercase tracking-[0.4em] text-fuchsia-400/80">
-                {subjects[0] ?? "Fiction"}
-              </span>
-              <h1 className="text-4xl font-extrabold text-teal-200 drop-shadow-[0_0_25px_rgba(20,184,166,0.85)]">
-                {work?.title ?? `Tome #${id}`}
-              </h1>
+          <div className={styles.content}>
+            <div className={styles.headline}>
+              <span className={styles.category}>{subjects[0] ?? "Fiction"}</span>
+              <h1 className={styles.title}>{work?.title ?? `Tome #${id}`}</h1>
               {authorNames.length > 0 && (
-                <p className="text-lg text-slate-300">
-                  by {authorNames.join(", ")}
-                </p>
+                <p className={styles.author}>by {authorNames.join(", ")}</p>
               )}
             </div>
 
-            <p className="text-base leading-relaxed text-slate-300/90">{description}</p>
+            <p className={styles.description}>{description}</p>
 
-            <dl className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4 shadow-[0_0_30px_rgba(148,163,184,0.1)]">
-                <dt className="text-xs uppercase tracking-[0.3em] text-slate-500">Genre</dt>
-                <dd className="text-sm text-slate-200">{genreLabel}</dd>
+            <dl className={styles.metaGrid}>
+              <div className={styles.metaItem}>
+                <dt className={styles.metaLabel}>Genre</dt>
+                <dd className={styles.metaValue}>{genreLabel}</dd>
               </div>
-              <div className="space-y-1 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4 shadow-[0_0_30px_rgba(148,163,184,0.1)]">
-                <dt className="text-xs uppercase tracking-[0.3em] text-slate-500">Publication Date</dt>
-                <dd className="text-sm text-slate-200">{publishDate ?? "Unknown"}</dd>
+              <div className={styles.metaItem}>
+                <dt className={styles.metaLabel}>Publication Date</dt>
+                <dd className={styles.metaValue}>{publishDate ?? "Unknown"}</dd>
               </div>
-              <div className="space-y-1 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4 shadow-[0_0_30px_rgba(148,163,184,0.1)] sm:col-span-2">
-                <dt className="text-xs uppercase tracking-[0.3em] text-slate-500">Status</dt>
-                <dd className={`text-sm font-semibold ${statusColor} ${statusGlow}`}>{statusLabel}</dd>
+              <div className={`${styles.metaItem} ${styles.metaItemFull}`}>
+                <dt className={styles.metaLabel}>Status</dt>
+                <dd className={statusClass}>{statusLabel}</dd>
               </div>
             </dl>
           </div>
         </div>
 
-        <div className="mt-10 flex justify-center">
+        <div className={styles.loanActions}>
           <BookLoanActions book={loanReadyBook} remoteStatus={status} />
         </div>
       </div>

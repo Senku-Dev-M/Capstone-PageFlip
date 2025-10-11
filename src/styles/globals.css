@@ -1,6 +1,3 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
 :root {
   color-scheme: dark;
   --pageflip-neon: #00f5ff;
@@ -13,18 +10,36 @@
   font-family: "Space Grotesk", ui-sans-serif, system-ui;
 }
 
-html {
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
   min-height: 100%;
   background-color: var(--pageflip-bg);
   scroll-behavior: smooth;
 }
 
 body {
-  @apply bg-transparent text-slate-100 antialiased;
+  margin: 0;
+  color: #f1f5f9;
+  background: linear-gradient(180deg, #000000 0%, #020617 50%, #000000 100%);
+  font-family: "Space Grotesk", ui-sans-serif, system-ui;
+  -webkit-font-smoothing: antialiased;
 }
 
-* {
-  @apply border-transparent outline-none;
+a {
+  color: inherit;
+}
+
+a,
+button {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
 }
 
 ::selection {
@@ -54,12 +69,7 @@ body {
 .neon-divider {
   position: relative;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(56, 189, 248, 0.8),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.8), transparent);
 }
 
 .glow-ring {
@@ -75,24 +85,33 @@ body {
 
 .cyber-input,
 .cyber-select {
-  @apply w-full rounded-xl border border-cyan-500/30 bg-slate-950/70 px-4 py-3 text-sm text-slate-100 transition duration-200 placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40;
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(2, 6, 23, 0.7);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #f8fafc;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 0 25px rgba(56, 189, 248, 0.12);
   backdrop-filter: blur(16px);
 }
 
+.cyber-input::placeholder {
+  color: rgba(148, 163, 184, 0.8);
+}
+
 .cyber-input:focus,
 .cyber-select:focus {
+  border-color: rgba(56, 189, 248, 0.5);
   box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);
+  outline: none;
 }
 
 .cyber-select {
   appearance: none;
   padding-right: 3rem;
-  background-image: linear-gradient(
-      135deg,
-      rgba(56, 189, 248, 0.25),
-      rgba(14, 165, 233, 0.15)
-    ),
+  background-image: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(14, 165, 233, 0.15)),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2300f5ff' d='M5 6 0 0h10z'/%3E%3C/svg%3E");
   background-position: left top, right 1rem center;
   background-repeat: no-repeat;
@@ -101,6 +120,22 @@ body {
 
 .cyber-select option {
   color: #020617;
+}
+
+.text-glow {
+  text-shadow: 0 0 18px rgba(20, 184, 166, 0.65);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* TODO: Add keyframe animations for glitch effects and holographic pulses. */

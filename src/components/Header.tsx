@@ -8,6 +8,8 @@ import { useAuthSession } from "@/hooks/useAuthSession";
 import LoginDialog from "@/components/LoginDialog";
 import RegisterDialog from "@/components/RegisterDialog";
 
+import styles from "./Header.module.css";
+
 const navLinks = [
   { href: "/", label: "Catalog", requiresAuth: false },
   { href: "/loans", label: "My Loans", requiresAuth: true },
@@ -56,17 +58,17 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-gray-700/50 bg-gray-900/70 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
-          <Link href="/" className="flex items-center gap-3 text-teal-400">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-teal-400/40 bg-teal-500/10 shadow-[0_0_12px_rgba(20,184,166,0.35)]">
+      <header className={styles.header}>
+        <div className={styles.inner}>
+          <Link href="/" className={styles.brand}>
+            <span className={styles.logoIcon}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.5"
-                className="h-5 w-5"
+                className={styles.logoSvg}
               >
                 <path
                   strokeLinecap="round"
@@ -80,33 +82,33 @@ export default function Header() {
                 />
               </svg>
             </span>
-            <span className="text-xl font-semibold tracking-[0.3em] text-teal-400 text-glow">
+            <span className={styles.brandName}>
               PageFlip
             </span>
           </Link>
-          <nav className="hidden flex-1 items-center justify-center gap-8 text-sm font-medium uppercase text-gray-300 md:flex">
+          <nav className={styles.nav}>
             {filteredLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="transition-colors duration-200 hover:text-teal-300"
+                className={styles.navLink}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
-          <div className="ml-auto hidden items-center gap-4 md:flex">
+          <div className={styles.userArea}>
             {isLoggedIn ? (
               <>
-                <span className="text-gray-300 font-semibold">{username}</span>
-                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-teal-500/60 bg-gray-900/80 shadow-[0_0_10px_rgba(20,184,166,0.35)]">
-                  <span className="h-6 w-6 rounded-full bg-gradient-to-br from-teal-400/40 via-transparent to-teal-500/20"></span>
+                <span className={styles.username}>{username}</span>
+                <span className={styles.avatar}>
+                  <span className={styles.avatarGlow}></span>
                 </span>
                 <button
                   type="button"
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="text-gray-400 transition-colors duration-200 hover:text-pink-500"
+                  className={styles.logoutButton}
                   aria-label="Log out"
                 >
                   <svg
@@ -115,7 +117,7 @@ export default function Header() {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="1.5"
-                    className="h-6 w-6"
+                    className={styles.icon}
                   >
                     <path
                       strokeLinecap="round"
@@ -131,12 +133,12 @@ export default function Header() {
                 </button>
               </>
             ) : isLoading ? (
-              <span className="text-sm font-medium text-gray-400">Connecting...</span>
+              <span className={styles.username}>Connecting...</span>
             ) : (
               <button
                 type="button"
                 onClick={openLogin}
-                className="bg-teal-500 text-white px-4 py-2 rounded-md text-sm font-semibold shadow-[0_0_10px_rgba(20,184,166,0.5)] transition hover:bg-teal-600 hover:shadow-[0_0_15px_rgba(20,184,166,0.8)] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+                className={styles.loginButton}
               >
                 Log In
               </button>
@@ -144,7 +146,7 @@ export default function Header() {
           </div>
           <button
             type="button"
-            className="ml-auto inline-flex items-center justify-center rounded-md border border-teal-500/40 px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-teal-200 shadow-[0_0_12px_rgba(20,184,166,0.35)] transition hover:border-teal-400 hover:text-teal-100 md:hidden"
+            className={styles.menuButton}
             onClick={() => setIsMenuOpen((prev) => !prev)}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-nav"
@@ -156,7 +158,7 @@ export default function Header() {
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
-              className="h-5 w-5"
+              className={styles.menuIcon}
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
@@ -165,36 +167,36 @@ export default function Header() {
         {isMenuOpen ? (
           <div
             id="mobile-nav"
-            className="space-y-4 border-t border-gray-700/50 px-6 py-5 text-sm font-medium uppercase text-gray-300 md:hidden"
+            className={styles.mobileNav}
           >
-            <div className="flex flex-col gap-3">
+            <div className={styles.mobileLinks}>
               {filteredLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-md border border-transparent px-3 py-2 transition hover:border-teal-500/40 hover:text-teal-300"
+                  className={styles.mobileLink}
                 >
                   {link.label}
                 </Link>
               ))}
             </div>
-            <div className="h-px bg-gradient-to-r from-transparent via-gray-700/60 to-transparent" />
+            <div className={styles.mobileDivider} />
             {isLoggedIn ? (
-              <div className="flex items-center justify-between gap-4 rounded-lg border border-teal-500/30 bg-gray-900/80 px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-teal-500/60 bg-gray-900/80 shadow-[0_0_10px_rgba(20,184,166,0.35)]">
-                    <span className="h-6 w-6 rounded-full bg-gradient-to-br from-teal-400/40 via-transparent to-teal-500/20"></span>
+              <div className={styles.mobileProfile}>
+                <div className={styles.mobileProfileInfo}>
+                  <span className={styles.avatar}>
+                    <span className={styles.avatarGlow}></span>
                   </span>
-                  <div className="flex flex-col">
-                    <span className="text-xs text-gray-400">Logged in as</span>
-                    <span className="text-sm font-semibold text-gray-200">{username}</span>
+                  <div className={styles.mobileProfileMeta}>
+                    <span className={styles.mobileProfileLabel}>Logged in as</span>
+                    <span className={styles.mobileProfileName}>{username}</span>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="text-gray-400 transition-colors duration-200 hover:text-pink-500"
+                  className={styles.logoutButton}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -202,7 +204,7 @@ export default function Header() {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="1.5"
-                    className="h-6 w-6"
+                    className={styles.icon}
                   >
                     <path
                       strokeLinecap="round"
@@ -218,7 +220,7 @@ export default function Header() {
                 </button>
               </div>
             ) : isLoading ? (
-              <span className="block text-center text-xs font-medium uppercase tracking-[0.35em] text-gray-400">
+              <span className={styles.mobileInitializing}>
                 Initializing...
               </span>
             ) : (
@@ -228,7 +230,7 @@ export default function Header() {
                   setIsMenuOpen(false);
                   openLogin();
                 }}
-                className="flex items-center justify-center bg-teal-500 text-white px-4 py-3 rounded-md text-sm font-semibold shadow-[0_0_10px_rgba(20,184,166,0.5)] transition hover:bg-teal-600 hover:shadow-[0_0_15px_rgba(20,184,166,0.8)] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+                className={styles.mobileLoginButton}
               >
                 Log In
               </button>

@@ -11,6 +11,8 @@ import { useUserStore } from "@/store/useUserStore";
 import BookGrid from "./BookGrid";
 import CatalogFilters from "./CatalogFilters";
 
+import styles from "./CatalogClient.module.css";
+
 type CatalogClientProps = {
   initialBooks: Book[];
 };
@@ -176,10 +178,10 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
   }, [totalPages, handleSetPage]);
 
   return (
-    <div className="space-y-6">
+    <div className={styles.container}>
       <CatalogFilters />
       {isLoading && (
-        <div className="rounded-xl border border-cyan-500/20 bg-slate-950/60 p-4 text-sm text-cyan-200">
+        <div className={styles.loading}>
           Scanning the grid for fresh transmissions...
         </div>
       )}
@@ -187,17 +189,17 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
         books={paginatedBooks}
         emptyState={<p>No transmissions detected. Try adjusting your filters.</p>}
       />
-      <div className="flex flex-col gap-4 rounded-xl border border-cyan-500/10 bg-slate-950/40 p-4 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
-        <span>
+      <div className={styles.paginationCard}>
+        <span className={styles.pageInfo}>
           {sortedBooks.length
             ? `Showing ${showingFrom}-${showingTo} of ${sortedBooks.length} results`
             : "No results found"}
         </span>
-        <div className="flex items-center gap-2">
+        <div className={styles.pagination}>
           <button
             type="button"
             onClick={() => handlePageChange(currentPage - 1)}
-            className="rounded-full border border-cyan-500/30 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300 transition hover:border-cyan-400/60 hover:text-cyan-200 disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-600"
+            className={`${styles.navButton} ${currentPage === 1 ? styles.disabled : ""}`}
             disabled={currentPage === 1}
           >
             Prev
@@ -211,11 +213,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
                 key={pageNumber}
                 type="button"
                 onClick={() => handlePageChange(pageNumber)}
-                className={`rounded-full border px-3 py-2 text-sm transition ${
-                  isActive
-                    ? "border-cyan-400/80 bg-cyan-500/20 text-cyan-200 shadow-[0_0_15px_rgba(56,189,248,0.35)]"
-                    : "border-cyan-500/20 text-slate-400 hover:border-cyan-400/60 hover:text-cyan-200"
-                }`}
+                className={`${styles.pageButton} ${isActive ? styles.pageButtonActive : ""}`}
               >
                 {pageNumber}
               </button>
@@ -224,7 +222,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
           <button
             type="button"
             onClick={() => handlePageChange(currentPage + 1)}
-            className="rounded-full border border-cyan-500/30 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300 transition hover:border-cyan-400/60 hover:text-cyan-200 disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-600"
+            className={`${styles.navButton} ${currentPage === totalPages ? styles.disabled : ""}`}
             disabled={currentPage === totalPages}
           >
             Next
