@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-import LoginDialog from "@/components/LoginDialog";
-import RegisterDialog from "@/components/RegisterDialog";
+import LoginDialog from "@/features/auth/components/LoginDialog";
+import RegisterDialog from "@/features/auth/components/RegisterDialog";
 
 import styles from "./AuthPage.module.css";
 
