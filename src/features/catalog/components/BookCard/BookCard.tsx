@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useMemo } from "react";
 
 import type { Book } from "@/features/catalog/types/book";
-import { useBookLoansStore } from "@/features/catalog/stores/useBookLoansStore";
+import { useBookLoans } from "@/features/catalog/hooks/useBookLoans";
 import { toast } from "react-hot-toast";
 
 import styles from "./BookCard.module.css";
@@ -25,22 +26,26 @@ const STATUS_STYLES: Record<string, string> = {
 export default function BookCard({ book }: BookCardProps) {
   const status = book.internalStatus ?? book.status ?? "available";
   const isBorrowedByCurrentUser = book.internalStatus === "borrowed" && book.isBorrowedByCurrentUser;
-  const returnBook = useBookLoansStore((state) => state.returnBook);
+  const { returnBook, userLoans, isLoading } = useBookLoans();
 
-  const showReturnButton = isBorrowedByCurrentUser;
+  const activeLoan = useMemo(
+    () =>
+      userLoans.find(
+        (loan) => loan.bookId === book.id && !loan.returnedAt,
+      ) ?? null,
+    [userLoans, book.id],
+  );
 
-  const handleReturn = () => {
+  const showReturnButton = isBorrowedByCurrentUser && !!activeLoan;
+
+  const handleReturn = async () => {
     if (showReturnButton && book.id) {
-      try {
-        const success = returnBook(book.id);
-        if (success) {
-          toast.success("Book returned successfully!");
-        } else {
-          toast.error("Failed to return the book");
-        }
-      } catch {
-        toast.error("Failed to process return");
+      if (!activeLoan) {
+        toast.error("Unable to locate active loan");
+        return;
       }
+
+      await returnBook(activeLoan.id);
     }
   };
 
@@ -87,7 +92,11 @@ export default function BookCard({ book }: BookCardProps) {
           </div>
           {showReturnButton && (
             <div className={styles.returnRow}>
-              <button onClick={handleReturn} className={styles.returnButton}>
+              <button
+                onClick={handleReturn}
+                className={styles.returnButton}
+                disabled={isLoading}
+              >
                 Return
               </button>
             </div>

@@ -1,29 +1,110 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
+
+import { createLoan, markLoanAsReturned, subscribeToActiveLoans, subscribeToUserLoans } from "@/features/catalog/api/loans";
 import { useBookLoansStore } from "@/features/catalog/stores/useBookLoansStore";
-import { useUserStore } from "@/features/auth/stores/useUserStore";
 import type { Book } from "@/features/catalog/types/book";
 import type { BookLoan } from "@/features/catalog/stores/useBookLoansStore";
-import { toast } from "react-hot-toast";
+import { useUserStore } from "@/features/auth/stores/useUserStore";
 
 interface UseBookLoansReturn {
   borrowBook: (book: Book) => Promise<boolean>;
-  returnBook: (bookId: string) => Promise<boolean>;
+  returnBook: (loanId: string) => Promise<boolean>;
   isLoading: boolean;
   userLoans: BookLoan[];
+}
+
+let activeLoansSubscriberCount = 0;
+let activeLoansUnsubscribe: (() => void) | null = null;
+
+const userLoanSubscriptions = new Map<string, { count: number; unsubscribe: () => void }>();
+
+function retainActiveLoans(setLoans: (loans: BookLoan[]) => void): () => void {
+  activeLoansSubscriberCount += 1;
+
+  if (!activeLoansUnsubscribe) {
+    activeLoansUnsubscribe = subscribeToActiveLoans(setLoans);
+  }
+
+  return () => {
+    activeLoansSubscriberCount = Math.max(activeLoansSubscriberCount - 1, 0);
+
+    if (activeLoansSubscriberCount === 0 && activeLoansUnsubscribe) {
+      activeLoansUnsubscribe();
+      activeLoansUnsubscribe = null;
+    }
+  };
+}
+
+function retainUserLoans(
+  userId: string,
+  setUserLoans: (loans: BookLoan[]) => void,
+): () => void {
+  const current = userLoanSubscriptions.get(userId);
+
+  if (current) {
+    current.count += 1;
+    return () => releaseUserLoans(userId);
+  }
+
+  const unsubscribe = subscribeToUserLoans(userId, setUserLoans);
+  userLoanSubscriptions.set(userId, { count: 1, unsubscribe });
+
+  return () => releaseUserLoans(userId);
+}
+
+function releaseUserLoans(userId: string): void {
+  const current = userLoanSubscriptions.get(userId);
+
+  if (!current) {
+    return;
+  }
+
+  const nextCount = current.count - 1;
+
+  if (nextCount <= 0) {
+    current.unsubscribe();
+    userLoanSubscriptions.delete(userId);
+    return;
+  }
+
+  current.count = nextCount;
 }
 
 export function useBookLoans(): UseBookLoansReturn {
   const [isLoading, setIsLoading] = useState(false);
   const user = useUserStore((state) => state.user);
-  const borrowBook = useBookLoansStore((state) => state.borrowBook);
-  const returnBook = useBookLoansStore((state) => state.returnBook);
+  const userId = user?.id ?? null;
+  const setLoans = useBookLoansStore((state) => state.setLoans);
+  const setUserLoans = useBookLoansStore((state) => state.setUserLoans);
+  const getBookAvailability = useBookLoansStore((state) => state.getBookAvailability);
+  const isBookBorrowedByUser = useBookLoansStore((state) => state.isBookBorrowedByUser);
   const userLoansState = useBookLoansStore((state) => state.userLoans);
 
-  // Memoize the filtered loans to prevent infinite loops
+  useEffect(() => {
+    const release = retainActiveLoans(setLoans);
+    return () => {
+      release();
+    };
+  }, [setLoans]);
+
+  useEffect(() => {
+    if (!userId) {
+      setUserLoans([]);
+      return;
+    }
+
+    const release = retainUserLoans(userId, setUserLoans);
+
+    return () => {
+      release();
+    };
+  }, [setUserLoans, userId]);
+
   const userLoans = useMemo(() => {
-    return userLoansState.filter(loan => !loan.returnedAt);
+    return userLoansState.filter((loan) => !loan.returnedAt);
   }, [userLoansState]);
 
   const handleBorrowBook = useCallback(async (book: Book): Promise<boolean> => {
@@ -32,51 +113,53 @@ export function useBookLoans(): UseBookLoansReturn {
       return false;
     }
 
+    const availability = getBookAvailability(book.id);
+    if (availability === "borrowed") {
+      toast.error(`"${book.title}" is not available for borrowing`);
+      return false;
+    }
+
+    if (isBookBorrowedByUser(book.id, user.id)) {
+      toast.error(`You already borrowed "${book.title}"`);
+      return false;
+    }
+
     setIsLoading(true);
 
     try {
-      // Simulate API call to external lending service
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const success = borrowBook(book.id, book.title, book.author, user);
-
-      if (success) {
-        toast.success(`"${book.title}" borrowed successfully!`);
-        return true;
-      } else {
-        toast.error(`"${book.title}" is not available for borrowing`);
-        return false;
-      }
+      await createLoan(book, user);
+      toast.success(`"${book.title}" borrowed successfully!`);
+      return true;
     } catch (error) {
-      console.error("Failed to borrow book:", error);
-      toast.error("Failed to process your request. Please try again.");
+      if (error instanceof Error && error.message === "BOOK_ALREADY_BORROWED") {
+        toast.error(`"${book.title}" is not available for borrowing`);
+      } else {
+        console.error("Failed to borrow book:", error);
+        toast.error("Failed to process your request. Please try again.");
+      }
       return false;
     } finally {
       setIsLoading(false);
     }
-  }, [user, borrowBook]);
+  }, [user, getBookAvailability, isBookBorrowedByUser]);
 
-  const handleReturnBook = useCallback(async (bookId: string): Promise<boolean> => {
+  const handleReturnBook = useCallback(async (loanId: string): Promise<boolean> => {
     if (!user) {
       toast.error("Please log in to return books");
       return false;
     }
 
+    if (!loanId) {
+      toast.error("Unable to locate loan to return");
+      return false;
+    }
+
     setIsLoading(true);
 
     try {
-      // Simulate API call to external lending service
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const success = returnBook(bookId);
-
-      if (success) {
-        toast.success("Book returned successfully!");
-        return true;
-      } else {
-        toast.error("Failed to return the book");
-        return false;
-      }
+      await markLoanAsReturned(loanId);
+      toast.success("Book returned successfully!");
+      return true;
     } catch (error) {
       console.error("Failed to return book:", error);
       toast.error("Failed to process your return. Please try again.");
@@ -84,7 +167,7 @@ export function useBookLoans(): UseBookLoansReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [user, returnBook]);
+  }, [user]);
 
   return {
     borrowBook: handleBorrowBook,

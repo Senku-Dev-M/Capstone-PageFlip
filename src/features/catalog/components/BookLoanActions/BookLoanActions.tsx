@@ -75,7 +75,10 @@ export default function BookLoanActions({ book, remoteStatus }: BookLoanActionsP
   };
 
   const handleReturn = async () => {
-    await returnBook(book.id);
+    if (!activeLoan) {
+      return;
+    }
+    await returnBook(activeLoan.id);
   };
 
   const onClick = isBorrowedByUser ? handleReturn : canBorrow ? handleBorrow : undefined;
