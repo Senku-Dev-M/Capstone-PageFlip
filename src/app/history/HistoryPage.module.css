@@ -1,0 +1,35 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.kicker {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  color: #fbbf24;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.panel {
+  border-radius: 1rem;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  background: rgba(2, 6, 23, 0.6);
+  padding: 1.5rem;
+  color: #94a3b8;
+  box-shadow: 0 0 28px rgba(251, 191, 36, 0.12);
+  backdrop-filter: blur(16px);
+}

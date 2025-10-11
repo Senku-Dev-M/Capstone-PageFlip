@@ -1,0 +1,54 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 48rem;
+}
+
+.kicker {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  color: #22d3ee;
+}
+
+.title {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 600;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.description {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.card {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: rgba(2, 6, 23, 0.6);
+  padding: 1.5rem;
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.statusMessage {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.errorMessage {
+  color: #f472b6;
+}
+
+.loadingMessage {
+  color: #94a3b8;
+}

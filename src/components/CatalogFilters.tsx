@@ -4,6 +4,8 @@ import { ChangeEvent } from "react";
 
 import { useBookStore } from "@/store/useBookStore";
 
+import styles from "./CatalogFilters.module.css";
+
 const CATEGORY_OPTIONS = [
   { label: "All Categories", value: "All" as const },
   { label: "Fiction", value: "Fiction" as const },
@@ -34,7 +36,7 @@ export default function CatalogFilters() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className={styles.container}>
       <input
         className="cyber-input"
         placeholder="Search by title or author..."
@@ -43,7 +45,7 @@ export default function CatalogFilters() {
         type="search"
         aria-label="Search the catalog by title or author"
       />
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className={styles.controls}>
         <select
           className="cyber-select"
           value={filters.category}

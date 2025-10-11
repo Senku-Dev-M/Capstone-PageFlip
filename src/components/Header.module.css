@@ -1,0 +1,281 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(14px);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  width: 100%;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #14b8a6;
+  text-decoration: none;
+}
+
+.logoIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  background: rgba(20, 184, 166, 0.1);
+  box-shadow: 0 0 12px rgba(20, 184, 166, 0.35);
+}
+
+.logoSvg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.brandName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: #14b8a6;
+  text-shadow: 0 0 18px rgba(20, 184, 166, 0.65);
+}
+
+.nav {
+  display: none;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #d1d5db;
+}
+
+.navLink {
+  color: inherit;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.navLink:hover {
+  color: #5eead4;
+}
+
+.userArea {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.username {
+  color: #d1d5db;
+  font-weight: 600;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(20, 184, 166, 0.6);
+  background: rgba(17, 24, 39, 0.8);
+  box-shadow: 0 0 10px rgba(20, 184, 166, 0.35);
+}
+
+.avatarGlow {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.4), transparent 60%, rgba(13, 148, 136, 0.2));
+}
+
+.logoutButton {
+  color: #9ca3af;
+  transition: color 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.logoutButton:hover:not(:disabled) {
+  color: #ec4899;
+}
+
+.loginButton,
+.mobileLoginButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: #14b8a6;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.loginButton:hover,
+.mobileLoginButton:hover {
+  background: #0d9488;
+  box-shadow: 0 0 15px rgba(20, 184, 166, 0.8);
+}
+
+.loginButton:focus-visible,
+.mobileLoginButton:focus-visible,
+.logoutButton:focus-visible,
+.menuButton:focus-visible {
+  outline: 2px solid rgba(45, 212, 191, 0.6);
+  outline-offset: 2px;
+}
+
+.menuButton {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(20, 184, 166, 0.4);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: #99f6e4;
+  box-shadow: 0 0 12px rgba(20, 184, 166, 0.35);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.menuButton:hover {
+  border-color: rgba(20, 184, 166, 0.6);
+  color: #ccfbf1;
+}
+
+.menuIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.mobileNav {
+  display: block;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid rgba(55, 65, 81, 0.5);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #d1d5db;
+  background: rgba(17, 24, 39, 0.9);
+}
+
+.mobileLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.mobileLink {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.mobileLink:hover {
+  border-color: rgba(20, 184, 166, 0.4);
+  color: #5eead4;
+}
+
+.mobileDivider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(75, 85, 99, 0.6), transparent);
+  margin-bottom: 1.25rem;
+}
+
+.mobileProfile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  background: rgba(17, 24, 39, 0.8);
+  box-shadow: 0 0 10px rgba(20, 184, 166, 0.35);
+}
+
+.mobileProfileInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobileProfileMeta {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileProfileLabel {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.mobileProfileName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.mobileInitializing {
+  display: block;
+  text-align: center;
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+@media (min-width: 768px) {
+  .nav {
+    display: flex;
+  }
+
+  .userArea {
+    display: flex;
+  }
+
+  .menuButton {
+    display: none;
+  }
+
+  .mobileNav {
+    display: none;
+  }
+}

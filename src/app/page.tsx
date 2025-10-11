@@ -2,6 +2,8 @@ import CatalogClient from "@/components/CatalogClient";
 import { fetchBooks } from "@/lib/booksApi";
 import type { Book } from "@/types/book";
 
+import styles from "./page.module.css";
+
 export default async function CatalogPage() {
   let books: Book[] = [];
   let error: string | null = null;
@@ -13,24 +15,24 @@ export default async function CatalogPage() {
   }
 
   return (
-    <section className="space-y-8">
-      <header className="space-y-3">
-        <p className="text-sm uppercase tracking-[0.4em] text-cyan-400">Catalog</p>
-        <h1 className="text-4xl font-semibold text-slate-100">
+    <section className={styles.section}>
+      <header className={styles.header}>
+        <p className={styles.kicker}>Catalog</p>
+        <h1 className={styles.title}>
           Explore Our Digital Catalog
         </h1>
-        <p className="max-w-2xl text-slate-400">
+        <p className={styles.description}>
           Find your next read on the Neo-Net. Tune your filters to surface
           fresh transmissions from across the digital stacks.
         </p>
       </header>
-      <div className="rounded-2xl border border-cyan-500/20 bg-slate-950/60 p-6 shadow-[0_0_35px_rgba(56,189,248,0.12)]">
+      <div className={styles.card}>
         {error ? (
-          <p className="text-center text-sm text-pink-300">
+          <p className={`${styles.statusMessage} ${styles.errorMessage}`}>
             {error}. Try refreshing the grid in a moment.
           </p>
         ) : books.length === 0 ? (
-          <p className="text-center text-sm text-slate-500">
+          <p className={`${styles.statusMessage} ${styles.loadingMessage}`}>
             Loading data from the Neo-Net archives...
           </p>
         ) : (
