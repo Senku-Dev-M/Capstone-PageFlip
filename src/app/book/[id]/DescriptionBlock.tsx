@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, memo } from "react";
 import clsx from "clsx";
 
 import styles from "./BookPage.module.css";
@@ -11,7 +11,7 @@ type DescriptionBlockProps = {
   className?: string;
 };
 
-export default function DescriptionBlock({ text, maxLength = 200, className }: DescriptionBlockProps) {
+export default memo(function DescriptionBlock({ text, maxLength = 200, className }: DescriptionBlockProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const { summary, needsTruncation } = useMemo(() => {
@@ -47,4 +47,4 @@ export default function DescriptionBlock({ text, maxLength = 200, className }: D
       ) : null}
     </div>
   );
-}
+});

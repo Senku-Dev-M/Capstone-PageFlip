@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { ReactNode } from "react";
 import type { Book } from "@/features/catalog/types/book";
 import BookCard from "../BookCard";
@@ -9,7 +10,7 @@ export type BookGridProps = {
   emptyState?: ReactNode;
 };
 
-export default function BookGrid({ books, emptyState }: BookGridProps) {
+export default memo(function BookGrid({ books, emptyState }: BookGridProps) {
   if (!books.length) {
     return <div className={styles.emptyState}>{emptyState ?? <p>No transmissions detected. Try adjusting your filters.</p>}</div>;
   }
@@ -24,4 +25,4 @@ export default function BookGrid({ books, emptyState }: BookGridProps) {
       ))}
     </div>
   );
-}
+});

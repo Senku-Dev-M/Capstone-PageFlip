@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
+import { memo, useMemo, useCallback } from "react";
 
 import type { Book } from "@/features/catalog/types/book";
 import { useBookLoans } from "@/features/catalog/hooks/useBookLoans";
@@ -23,7 +23,13 @@ const STATUS_STYLES: Record<string, string> = {
   unavailable: styles.statusUnavailable,
 };
 
-export default function BookCard({ book }: BookCardProps) {
+// Separate status computation to avoid re-computation
+function getStatusClasses(status: string, isBorrowedByCurrentUser?: boolean) {
+  const displayStatus = isBorrowedByCurrentUser ? "borrowedByUser" : status;
+  return `${styles.statusChip} ${STATUS_STYLES[displayStatus]}`;
+}
+
+export default memo(function BookCard({ book }: BookCardProps) {
   const status = book.internalStatus ?? book.status ?? "available";
   const isBorrowedByCurrentUser = book.internalStatus === "borrowed" && book.isBorrowedByCurrentUser;
   const { returnBook, userLoans, isLoading } = useBookLoans();
@@ -38,7 +44,7 @@ export default function BookCard({ book }: BookCardProps) {
 
   const showReturnButton = isBorrowedByCurrentUser && !!activeLoan;
 
-  const handleReturn = async () => {
+  const handleReturn = useCallback(async () => {
     if (showReturnButton && book.id) {
       if (!activeLoan) {
         toast.error("Unable to locate active loan");
@@ -47,7 +53,7 @@ export default function BookCard({ book }: BookCardProps) {
 
       await returnBook(activeLoan.id);
     }
-  };
+  }, [showReturnButton, book.id, activeLoan, returnBook]);
 
   return (
     <article className={styles.card}>
@@ -71,9 +77,7 @@ export default function BookCard({ book }: BookCardProps) {
           </div>
         )}
         <span
-          className={`${styles.statusChip} ${
-            isBorrowedByCurrentUser ? STATUS_STYLES.borrowedByUser : STATUS_STYLES[status]
-          }`}
+          className={getStatusClasses(status, isBorrowedByCurrentUser)}
         >
           {isBorrowedByCurrentUser ? "Your Book" : status}
         </span>
@@ -106,4 +110,4 @@ export default function BookCard({ book }: BookCardProps) {
       <div className={styles.bottomGlow} />
     </article>
   );
-}
+});

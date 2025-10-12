@@ -1,6 +1,8 @@
-import CatalogClient from "@/features/catalog/components/CatalogClient";
+import { Suspense, lazy } from "react";
 import { fetchBooks } from "@/features/catalog/api/booksApi";
 import type { Book } from "@/features/catalog/types/book";
+
+const CatalogClient = lazy(() => import("@/features/catalog/components/CatalogClient"));
 
 import styles from "./page.module.css";
 
@@ -36,7 +38,13 @@ export default async function CatalogPage() {
             Loading data from the Neo-Net archives...
           </p>
         ) : (
-          <CatalogClient initialBooks={books} />
+          <Suspense fallback={
+            <div className={`${styles.statusMessage} ${styles.loadingMessage}`}>
+              Scanning the grid for fresh transmissions...
+            </div>
+          }>
+            <CatalogClient initialBooks={books} />
+          </Suspense>
         )}
       </div>
     </section>

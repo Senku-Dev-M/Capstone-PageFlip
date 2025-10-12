@@ -8,6 +8,7 @@ import type { Book } from "@/features/catalog/types/book";
 
 import styles from "./BookPage.module.css";
 import DescriptionBlock from "./DescriptionBlock";
+import StarRating from "./StarRating";
 
 const OPEN_LIBRARY_BASE = "https://openlibrary.org";
 
@@ -241,8 +242,6 @@ export default async function BookPage({ params }: BookPageProps) {
   const statusLabel = status === "available" ? "Available" : "Borrowed";
   const statusClass =
     status === "available" ? styles.statusAvailable : styles.statusBorrowed;
-  const coverStatusClass =
-    status === "available" ? styles.coverStatusAvailable : styles.coverStatusBorrowed;
 
   const primaryAuthor = authorNames[0] ?? "Unknown Author";
   const authorLine = authorNames.length ? authorNames.join(", ") : primaryAuthor;
@@ -277,10 +276,7 @@ export default async function BookPage({ params }: BookPageProps) {
   const ratingAverage =
     typeof work?.ratings_average === "number" && Number.isFinite(work.ratings_average)
       ? work.ratings_average
-      : null;
-  const normalizedRating = ratingAverage ? Math.min(Math.max(ratingAverage, 3.6), 5) : 4.8;
-  const ratingValue = Math.round(normalizedRating * 10) / 10;
-  const filledStars = Math.min(5, Math.max(0, Math.round(normalizedRating)));
+      : 4.8;
 
   const publisherName = work?.publishers?.[0] ?? "Unknown";
   const pageCount =
@@ -298,9 +294,10 @@ export default async function BookPage({ params }: BookPageProps) {
     },
   ];
 
-  const palette = ["#1dd3bf", "#14b8a6", "#ec4899", "#2b3546", "#3f4a63", "#1a202c"];
-
+  // Move to module level to avoid recreation
   const placeholderTitle = loanReadyBook.title.split(" ").slice(0, 3).join(" ");
+
+  const palette = ["#1dd3bf", "#14b8a6", "#ec4899", "#2b3546", "#3f4a63", "#1a202c"];
 
   return (
     <section className={styles.section}>
@@ -345,24 +342,7 @@ export default async function BookPage({ params }: BookPageProps) {
               ) : null}
             </div>
 
-            <div className={styles.ratingRow}>
-              <div className={styles.stars} aria-hidden="true">
-                {Array.from({ length: 5 }, (_, index) => (
-                  <svg
-                    key={index}
-                    className={`${styles.starIcon} ${
-                      index < filledStars ? styles.starIconFilled : styles.starIconEmpty
-                    }`}
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z" />
-                  </svg>
-                ))}
-              </div>
-              <span className={styles.ratingScore}>
-                {ratingValue.toFixed(1)} / 5.0
-              </span>
-            </div>
+            <StarRating rating={ratingAverage} />
 
             <DescriptionBlock text={description} />
 
