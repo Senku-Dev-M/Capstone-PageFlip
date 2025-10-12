@@ -79,3 +79,25 @@
     transform: rotate(360deg);
   }
 }
+
+.wishlist {
+  border-color: rgba(252, 211, 77, 0.4);
+  background: rgba(252, 211, 77, 0.18);
+  color: var(--secondary-text);
+}
+
+.wishlist:hover:not(.disabled) {
+  background: rgba(252, 211, 77, 0.28);
+  color: #fef3c7;
+}
+
+.wishlistActive {
+  border-color: rgba(252, 211, 77, 0.6);
+  background: rgba(252, 211, 77, 0.25);
+  color: #fef3c7;
+}
+
+.wishlistActive:hover:not(.disabled) {
+  background: rgba(252, 211, 77, 0.35);
+  color: #fef3c7;
+}

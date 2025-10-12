@@ -2,7 +2,7 @@
 
 import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { auth } from "@/core/firebase";
 
@@ -33,10 +33,10 @@ export default function LoginDialog({
     setIsSubmitting(false);
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     resetState();
     onClose();
-  };
+  }, [onClose]);
 
   const handleSwitchToRegister = () => {
     resetState();
@@ -68,6 +68,17 @@ export default function LoginDialog({
       resetState();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (status) {
+      // Auto-close modal after successful login
+      const timer = setTimeout(() => {
+        handleClose();
+      }, 3000); // 3 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [status, handleClose]);
 
   if (!isOpen) {
     return null;

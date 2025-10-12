@@ -1,10 +1,12 @@
 import type { Book } from "@/features/catalog/types/book";
 import { useBookLoansStore } from "@/features/catalog/stores/useBookLoansStore";
+import { useWishlistStore } from "@/features/catalog/stores/useWishlistStore";
 
 export interface EnrichedBook extends Book {
   internalStatus?: "available" | "borrowed";
   isBorrowedByCurrentUser?: boolean;
   isBorrowable?: boolean;
+  isInWishlist?: boolean;
 }
 
 /**
@@ -13,17 +15,20 @@ export interface EnrichedBook extends Book {
 export function enrichBooksWithLoanStatus(books: Book[], userId: string | null): EnrichedBook[] {
   const getBookAvailability = useBookLoansStore.getState().getBookAvailability;
   const isBookBorrowedByUser = useBookLoansStore.getState().isBookBorrowedByUser;
+  const isBookInWishlist = useWishlistStore.getState().isBookInWishlist;
 
   return books.map(book => {
     const internalStatus = getBookAvailability(book.id);
     const isBorrowedByCurrentUser = userId ? isBookBorrowedByUser(book.id, userId) : false;
     const isBorrowable = internalStatus === "available" && !!userId;
+    const bookIsInWishlist = isBookInWishlist(book.id);
 
     return {
       ...book,
       internalStatus,
       isBorrowedByCurrentUser,
       isBorrowable,
+      isInWishlist: bookIsInWishlist,
     };
   });
 }

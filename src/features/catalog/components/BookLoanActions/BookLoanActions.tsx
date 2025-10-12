@@ -6,6 +6,7 @@ import type { Book } from "@/features/catalog/types/book";
 import { useBookLoans } from "@/features/catalog/hooks/useBookLoans";
 import { useBookLoansStore } from "@/features/catalog/stores/useBookLoansStore";
 import { useUserStore } from "@/features/auth/stores/useUserStore";
+import { useWishlist } from "@/features/catalog/hooks/useWishlist";
 
 import styles from "./BookLoanActions.module.css";
 
@@ -18,6 +19,7 @@ export default function BookLoanActions({ book, remoteStatus }: BookLoanActionsP
   const user = useUserStore((state) => state.user);
   const userId = user?.id ?? null;
   const { borrowBook, returnBook, isLoading } = useBookLoans();
+  const { addToWishlist, removeFromWishlist, isBookInWishlist } = useWishlist();
 
   const loans = useBookLoansStore((state) => state.loans);
   const activeLoan = useMemo(
@@ -29,6 +31,7 @@ export default function BookLoanActions({ book, remoteStatus }: BookLoanActionsP
   );
   const isBorrowed = Boolean(activeLoan);
   const isBorrowedByUser = Boolean(activeLoan && userId && activeLoan.borrowedBy === userId);
+  const bookIsInWishlist = isBookInWishlist(book.id);
 
   const canBorrow = !isBorrowed && remoteStatus === "available";
 
@@ -65,7 +68,16 @@ export default function BookLoanActions({ book, remoteStatus }: BookLoanActionsP
     await returnBook(activeLoan.id);
   };
 
+  const handleWishlistToggle = async () => {
+    if (bookIsInWishlist) {
+      await removeFromWishlist(book.id);
+    } else {
+      await addToWishlist(book);
+    }
+  };
+
   const onClick = isBorrowedByUser ? handleReturn : canBorrow ? handleBorrow : undefined;
+  const wishlistButtonClasses = [styles.button, bookIsInWishlist ? styles.wishlistActive : styles.wishlist];
 
   return (
     <div className={styles.container}>
@@ -80,6 +92,18 @@ export default function BookLoanActions({ book, remoteStatus }: BookLoanActionsP
             <span className={styles.spinner} />
           ) : null}
           <span>{actionLabel}</span>
+        </span>
+      </button>
+      <button
+        type="button"
+        className={wishlistButtonClasses.join(" ")}
+        onClick={handleWishlistToggle}
+        disabled={!user}
+      >
+        <span className={styles.content}>
+          <span>
+            {bookIsInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+          </span>
         </span>
       </button>
     </div>
