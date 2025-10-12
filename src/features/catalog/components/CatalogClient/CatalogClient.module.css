@@ -42,6 +42,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .pagination {
+    gap: 0.25rem;
+    justify-content: center;
+  }
 }
 
 .pageButton,
@@ -58,6 +66,15 @@
   color: var(--secondary-text);
   background: transparent;
   transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .pageButton,
+  .navButton {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
+  }
 }
 
 .pageButton:hover,
@@ -76,4 +93,26 @@
 .disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+.ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  font-size: 0.75rem;
+  color: var(--secondary-text);
+  opacity: 0.7;
+}
+
+@media (max-width: 640px) {
+  .ellipsis {
+    min-width: 1.5rem;
+    font-size: 0.7rem;
+  }
+
+  .paginationCard {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
 }

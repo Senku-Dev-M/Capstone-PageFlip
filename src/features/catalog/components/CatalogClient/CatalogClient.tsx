@@ -177,6 +177,119 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
     handleSetPage(page);
   }, [totalPages, handleSetPage]);
 
+  // Generate limited pagination buttons to prevent overflow
+  const getPaginationButtons = useCallback(() => {
+    const buttons = [];
+
+    // Always show Prev button
+    buttons.push(
+      <button
+        key="prev"
+        type="button"
+        onClick={() => handlePageChange(currentPage - 1)}
+        className={`${styles.navButton} ${currentPage === 1 ? styles.disabled : ""}`}
+        disabled={currentPage === 1}
+      >
+        Prev
+      </button>
+    );
+
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages + 2) {
+      // Show all pages if total is small
+      for (let i = 1; i <= totalPages; i++) {
+        const isActive = i === currentPage;
+        buttons.push(
+          <button
+            key={i}
+            type="button"
+            onClick={() => handlePageChange(i)}
+            className={`${styles.pageButton} ${isActive ? styles.pageButtonActive : ""}`}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      // Show limited range with ellipsis
+      const leftBound = Math.max(1, currentPage - 2);
+      const rightBound = Math.min(totalPages, currentPage + 2);
+
+      // Always show first page
+      if (leftBound > 1) {
+        buttons.push(
+          <button
+            key={1}
+            type="button"
+            onClick={() => handlePageChange(1)}
+            className={styles.pageButton}
+          >
+            1
+          </button>
+        );
+        if (leftBound > 2) {
+          buttons.push(
+            <span key="ellipsis-left" className={styles.ellipsis}>
+              ...
+            </span>
+          );
+        }
+      }
+
+      // Show current page range
+      for (let i = leftBound; i <= rightBound; i++) {
+        const isActive = i === currentPage;
+        buttons.push(
+          <button
+            key={i}
+            type="button"
+            onClick={() => handlePageChange(i)}
+            className={`${styles.pageButton} ${isActive ? styles.pageButtonActive : ""}`}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      // Always show last page
+      if (rightBound < totalPages) {
+        if (rightBound < totalPages - 1) {
+          buttons.push(
+            <span key="ellipsis-right" className={styles.ellipsis}>
+              ...
+            </span>
+          );
+        }
+        buttons.push(
+          <button
+            key={totalPages}
+            type="button"
+            onClick={() => handlePageChange(totalPages)}
+            className={styles.pageButton}
+          >
+            {totalPages}
+          </button>
+        );
+      }
+    }
+
+    // Always show Next button
+    buttons.push(
+      <button
+        key="next"
+        type="button"
+        onClick={() => handlePageChange(currentPage + 1)}
+        className={`${styles.navButton} ${currentPage === totalPages ? styles.disabled : ""}`}
+        disabled={currentPage === totalPages}
+      >
+        Next
+      </button>
+    );
+
+    return buttons;
+  }, [currentPage, totalPages, handlePageChange]);
+
   return (
     <div className={styles.container}>
       <CatalogFilters />
@@ -196,37 +309,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
             : "No results found"}
         </span>
         <div className={styles.pagination}>
-          <button
-            type="button"
-            onClick={() => handlePageChange(currentPage - 1)}
-            className={`${styles.navButton} ${currentPage === 1 ? styles.disabled : ""}`}
-            disabled={currentPage === 1}
-          >
-            Prev
-          </button>
-          {Array.from({ length: totalPages }, (_, index) => {
-            const pageNumber = index + 1;
-            const isActive = pageNumber === currentPage;
-
-            return (
-              <button
-                key={pageNumber}
-                type="button"
-                onClick={() => handlePageChange(pageNumber)}
-                className={`${styles.pageButton} ${isActive ? styles.pageButtonActive : ""}`}
-              >
-                {pageNumber}
-              </button>
-            );
-          })}
-          <button
-            type="button"
-            onClick={() => handlePageChange(currentPage + 1)}
-            className={`${styles.navButton} ${currentPage === totalPages ? styles.disabled : ""}`}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+          {getPaginationButtons()}
         </div>
       </div>
     </div>

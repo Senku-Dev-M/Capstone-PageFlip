@@ -42,7 +42,7 @@ export default function DescriptionBlock({ text, maxLength = 200, className }: D
           className={styles.descriptionLink}
           onClick={() => setIsExpanded((prev) => !prev)}
         >
-          {isExpanded ? "Ver menos" : "Ver más"}
+          {isExpanded ? "See less" : "See more"}
         </button>
       ) : null}
     </div>
