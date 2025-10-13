@@ -1,47 +1,170 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PageFlip - Biblioteca digital ciberpunk
 
-## Getting Started
+PageFlip es una app web creada con Next.js 15 que combina el estilo de una biblioteca digital ciberpunk con integraciones en tiempo real. El catalogo consume el API publica de Open Library, mientras que prestamos, wishlist y sesiones se persisten en Firebase (Auth + Firestore). El resultado es un front-end 100 % TypeScript centrado en la experiencia de lectura y administracion de libros.
 
-First, run the development server:
+## Tabla de contenidos
+- [Resumen](#resumen)
+- [Caracteristicas clave](#caracteristicas-clave)
+- [Stack tecnologico](#stack-tecnologico)
+- [Arquitectura](#arquitectura)
+- [Stores y estado](#stores-y-estado)
+- [Integraciones externas](#integraciones-externas)
+- [Tecnicas de rendimiento](#tecnicas-de-rendimiento)
+- [Configuracion](#configuracion)
+- [Variables de entorno](#variables-de-entorno)
+- [Colecciones de Firestore](#colecciones-de-firestore)
+- [Flujo de datos principal](#flujo-de-datos-principal)
+- [Estilos y UX](#estilos-y-ux)
+- [Scripts disponibles](#scripts-disponibles)
+- [Calidad y recomendaciones](#calidad-y-recomendaciones)
+- [Roadmap sugerido](#roadmap-sugerido)
+- [Recursos](#recursos)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Resumen
+
+- Catalogo inicial renderizado en el servidor (`src/app/page.tsx`) con hidratacion de un cliente avanzado.
+- Pagina de detalle dinamica (`src/app/book/[id]/page.tsx`) que amplifica metadata, recomendaciones y acciones de prestamo.
+- Flujo completo de autenticacion con modales personalizados (login y registro) respaldados por Firebase Auth.
+- Manejo de prestamos activos, historial y wishlist en tiempo real gracias a suscripciones a Firestore.
+- Interfaz responsive con atmosfera neon y microinteracciones pensadas para portabilidad.
+
+## Caracteristicas clave
+
+- Catalogo con busqueda, filtros por categoria y ordenamiento con paginacion client-side optimizada.
+- Acciones de prestamo y devolucion desde la tarjeta, la ficha del libro o los listados dedicados.
+- Wishlist sincronizada por usuario y paneles especificos para prestamos activos e historial.
+- Header con navegacion condicional, modales reutilizables y modo burger para dispositivos moviles.
+- Componentes feature-first con estilos CSS Modules co-localizados y alias absolutos (`@/`).
+
+## Stack tecnologico
+
+- Next.js 15 (App Router, server components, `fetch` con `revalidate`).
+- React 19 con Suspense, `lazy` y hooks concurrentes como `useDeferredValue`.
+- TypeScript estricto con alias `@/*` definido en `tsconfig.json`.
+- Firebase (Auth + Firestore) para identidad y persistencia en tiempo real.
+- Zustand + Devtools para stores predecibles y trazables.
+- CSS Modules y hoja global (`src/styles/globals.css`) para la tematizacion ciberpunk.
+- React Hot Toast para feedback no intrusivo.
+- Herramientas de calidad: ESLint 9 y PostCSS.
+
+## Arquitectura
+
+```
+src/
+  app/                # Rutas Next.js (catalogo, auth, loans, wishlist, history, book/[id])
+  core/               # Singletons agnosticos, p.ej. configuracion de Firebase
+  features/
+    auth/             # API, componentes de dialogo, hooks y store de usuario
+    catalog/          # API REST/Open Library, stores, hooks y componentes del catalogo
+  shared/             # Layouts y utilidades reutilizables (Header, helpers)
+  styles/             # Estilos globales
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Las paginas se alojan en la carpeta `app/` y combinan server y client components segun la necesidad.
+- Cada feature co-loca UI, estado (`stores/`), hooks y helpers para mantener alta cohesion.
+- Los estilos se distribuyen como `.module.css` junto a cada componente para favorecer el mantenimiento.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Stores y estado
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Store | Archivo | Dominio | Detalles |
+| ----- | ------- | ------- | -------- |
+| `useUserStore` | `src/features/auth/stores/useUserStore.ts` | Sesion y carga inicial | Mantiene usuario normalizado, integra devtools y controla `isLoading`. |
+| `useBookStore` | `src/features/catalog/stores/useBookStore.ts` | Catalogo, filtros y paginacion | Sincroniza libros cargados, filtros, `useDeferredValue` y `AbortController` para busqueda. |
+| `useBookLoansStore` | `src/features/catalog/stores/useBookLoansStore.ts` | Prestamos activos y por usuario | Expone selectores para disponibilidad y reutiliza en hooks `useBookLoans` y `useBookHistory`. |
+| `useWishlistStore` | `src/features/catalog/stores/useWishlistStore.ts` | Wishlist por usuario | Guarda items suscritos en tiempo real y chequea existencia antes de agregar. |
+| `useLoanStore` | `src/features/catalog/stores/useLoanStore.ts` | Estado compuesto (legacy) | Store alternativo para flujos agregados; marcado con TODO para persistencia futura. |
 
-## Project Structure
+Cada hook (`useBookLoans`, `useWishlist`, `useBookHistory`) comparte suscripciones a Firestore con contadores internos para evitar duplicar listeners cuando varios componentes montan simultaneamente.
 
-The source code is organized into feature-oriented folders to make related UI, state, and data logic easy to find:
+## Integraciones externas
 
-- `src/features/auth` – Authentication dialogs, hooks, stores, and Firebase helpers.
-- `src/features/catalog` – Catalog UI, state stores, hooks, API helpers, and domain types.
-- `src/shared` – Layout components and cross-cutting utilities shared across features.
-- `src/core` – Framework-agnostic singletons such as the Firebase client.
+- **Open Library API** (`features/catalog/api/booksApi.ts` y `book/[id]/page.tsx`): busqueda, fichas de obras y recomendaciones, con almacenamiento en cache via `revalidate`.
+- **Firebase Auth** (`core/firebase.ts`, `features/auth/api/auth.ts`): login, registro y cierre de sesion email/password.
+- **Cloud Firestore** (`features/catalog/api/loans.ts`, `wishlist.ts`): colecciones `loans` y `wishlists` con suscripciones `onSnapshot`.
+- **Next Image**: manejo de portadas remotas habilitado mediante `next.config.ts`.
 
-Each component folder co-locates its styles and exports an `index.ts` file so imports remain tidy across the app.
+## Tecnicas de rendimiento
 
-## Learn More
+- Renderizado inicial en el servidor y `lazy()` + `Suspense` para diferir `CatalogFilters`, `BookGrid` y otros componentes pesados.
+- Busqueda con `useDeferredValue`, debounce manual y `AbortController` para evitar peticiones obsoletas.
+- Selectores especificos de Zustand, `useMemo` y `useCallback` para minimizar renders en cascada.
+- Suscripciones compartidas a Firestore con recuento de consumidores para reducir costos de red y CPU.
+- `fetch` server-side con `next: { revalidate: 3600 }` para cachear respuestas de Open Library.
+- Componentes memoizados (`memo`) en tarjetas, filtros y grids para listas extensas.
 
-To learn more about Next.js, take a look at the following resources:
+## Configuracion
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Requisitos previos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Node.js 20.0 o superior (Next.js 15 requiere Node >= 18.18; se recomienda la rama LTS 20).
+- npm 10 (instalado junto con Node) o gestor equivalente.
 
-## Deploy on Vercel
+### Instalacion rapida
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Clonar el repositorio y entrar en la carpeta del proyecto.
+2. Copiar `.env.example` a `.env.local` (o `.env`) y completar las credenciales de Firebase.
+3. Instalar dependencias: `npm install`.
+4. Levantar el entorno local: `npm run dev` y abrir `http://localhost:3000`.
+5. Construir para produccion cuando sea necesario: `npm run build` seguido de `npm run start`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Variables de entorno
+
+Todas las claves son de exposicion publica (`NEXT_PUBLIC_*`) porque se consumen desde el cliente:
+
+| Variable | Descripcion |
+| -------- | ----------- |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | API key del proyecto Firebase. |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Dominio auth (`xxxx.firebaseapp.com`). |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | ID del proyecto. |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Bucket de almacenamiento. |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Sender ID para servicios de Firebase. |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | Identificador de la app Firebase. |
+
+Coloca estas claves en `.env.local` para mantenerlas fuera del control de versiones.
+
+## Colecciones de Firestore
+
+- `loans`: documentos con `bookId`, `title`, `borrowedBy`, fechas (`borrowedAt`, `dueDate`, `returnedAt`) y datos de usuario. Se consulta por `returnedAt == null` para prestamos activos y por `borrowedBy`.
+- `wishlists`: documentos con `bookId`, `title`, `author`, `userId` y `addedAt`. Se consulta por usuario y se evita duplicar libros mediante queries previas.
+
+La normalizacion en `loans.ts` y `wishlist.ts` transforma `Timestamp` en ISO strings listas para renderizar.
+
+## Flujo de datos principal
+
+- El catalogo se hidrata con libros renderizados en el servidor y luego sincroniza estado local en `useBookStore`.
+- Los componentes de acciones (`BookCard`, `BookLoanActions`) consumen hooks que lean selectores de Zustand para disponibilidad y toasts.
+- El header usa `useAuthSession` para escuchar a Firebase Auth y propagar el usuario al resto de la app.
+- Paginas de prestamos, historial y wishlist montan suscripciones en `useBookLoans` / `useBookHistory` / `useWishlist`, reutilizando listeners cuando multiples vistas estan activas.
+
+## Estilos y UX
+
+- Tema oscuro global definido en `src/styles/globals.css` con variables CSS y helpers (`cyber-input`, `cyber-select`).
+- Cada componente tiene su propio `.module.css` con efectos neon, brillos y degradados.
+- El layout (`src/app/layout.tsx`) aloja el `Header` y deja espacio para futuros providers globales.
+
+## Scripts disponibles
+
+- `npm run dev`: inicia el entorno de desarrollo con recarga en caliente.
+- `npm run build`: genera la version optimizada para produccion.
+- `npm run start`: sirve la build producida.
+- `npm run lint`: ejecuta ESLint con la configuracion de Next 15.
+
+## Calidad y recomendaciones
+
+- El proyecto usa TypeScript estricto y ESLint 9; se sugiere ejecutar `npm run lint` antes de cada commit.
+- No existen pruebas automatizadas aun; considera agregar unit tests para hooks criticos y pruebas E2E para los flujos de prestamo.
+- Aprovecha la extension Redux DevTools para inspeccionar stores de Zustand en desarrollo (`devtools` ya esta habilitado).
+
+## Roadmap sugerido
+
+- Completar TODOs marcados en codigo: persistencia de `useLoanStore`, agregar Firebase Analytics y caching adicional.
+- Implementar persistencia offline o caching local para catalogo cuando la API externa falle.
+- Integrar un gestor de toasts global (p.ej. `<Toaster />`) y mensajes de error mas detallados.
+- Mejorar accesibilidad con avisos ARIA en modales y feedback del teclado.
+
+## Recursos
+
+- [Documentacion de Next.js](https://nextjs.org/docs)
+- [SDK web de Firebase](https://firebase.google.com/docs/web/setup)
+- [Open Library API](https://openlibrary.org/developers/api)
+- [Zustand](https://docs.pmnd.rs/zustand/getting-started/introduction)
