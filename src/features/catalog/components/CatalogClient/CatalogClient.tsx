@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback, useDeferredValue, lazy, Suspense } from "react";
 
 import { useBookStore } from "@/features/catalog/stores/useBookStore";
 import type { Book } from "@/features/catalog/types/book";
@@ -8,14 +8,14 @@ import { fetchBooks } from "@/features/catalog/api/booksApi";
 import { enrichBooksWithLoanStatus } from "@/features/catalog/utils/bookLoans";
 import { useUserStore } from "@/features/auth/stores/useUserStore";
 
-import BookGrid from "../BookGrid";
-import CatalogFilters from "../CatalogFilters";
-
 import styles from "./CatalogClient.module.css";
 
 export type CatalogClientProps = {
   initialBooks: Book[];
 };
+
+const CatalogFilters = lazy(() => import("../CatalogFilters"));
+const BookGrid = lazy(() => import("../BookGrid"));
 
 export default function CatalogClient({ initialBooks }: CatalogClientProps) {
   const books = useBookStore((state) => state.books);
@@ -29,6 +29,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
   const user = useUserStore((state) => state.user);
 
   const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
+  const deferredSearch = useDeferredValue(filters.search);
   const hasInitializedSearch = useRef(false);
 
   // Memoize handlers and functions
@@ -101,7 +102,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
   }, [debouncedSearch, handleSetBooks, handleSetIsLoading]);
 
   const filteredBooks = useMemo(() => {
-    const searchTerm = filters.search.trim().toLowerCase();
+    const searchTerm = deferredSearch.trim().toLowerCase();
 
     return books.filter((book) => {
       const matchesSearch =
@@ -116,7 +117,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
 
       return matchesSearch && matchesCategory;
     });
-  }, [books, filters.category, filters.search]);
+  }, [books, filters.category, deferredSearch]);
 
   const sortedBooks = useMemo(() => {
     const sorted = [...filteredBooks];
@@ -157,11 +158,11 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
   }, [pagination.currentPage, totalPages, handleSetPage]);
 
   const currentPage = Math.min(pagination.currentPage, totalPages);
+  const paginatedBooks = useMemo(() => {
+    const sliceStart = (currentPage - 1) * pagination.pageSize;
+    return enrichedBooks.slice(sliceStart, sliceStart + pagination.pageSize);
+  }, [enrichedBooks, currentPage, pagination.pageSize]);
   const startIndex = (currentPage - 1) * pagination.pageSize;
-  const paginatedBooks = enrichedBooks.slice(
-    startIndex,
-    startIndex + pagination.pageSize,
-  );
 
   const showingFrom = sortedBooks.length ? startIndex + 1 : 0;
   const showingTo = Math.min(
@@ -178,7 +179,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
   }, [totalPages, handleSetPage]);
 
   // Generate limited pagination buttons to prevent overflow
-  const getPaginationButtons = useCallback(() => {
+  const paginationButtons = useMemo(() => {
     const buttons = [];
 
     // Always show Prev button
@@ -292,16 +293,20 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
 
   return (
     <div className={styles.container}>
-      <CatalogFilters />
+      <Suspense fallback={<div className={styles.loading}>Preparing filters...</div>}>
+        <CatalogFilters />
+      </Suspense>
       {isLoading && (
         <div className={styles.loading}>
           Scanning the grid for fresh transmissions...
         </div>
       )}
-      <BookGrid
-        books={paginatedBooks}
-        emptyState={<p>No transmissions detected. Try adjusting your filters.</p>}
-      />
+      <Suspense fallback={<div className={styles.loading}>Preparing catalog grid...</div>}>
+        <BookGrid
+          books={paginatedBooks}
+          emptyState={<p>No transmissions detected. Try adjusting your filters.</p>}
+        />
+      </Suspense>
       <div className={styles.paginationCard}>
         <span className={styles.pageInfo}>
           {sortedBooks.length
@@ -309,7 +314,7 @@ export default function CatalogClient({ initialBooks }: CatalogClientProps) {
             : "No results found"}
         </span>
         <div className={styles.pagination}>
-          {getPaginationButtons()}
+          {paginationButtons}
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent } from "react";
+import { ChangeEvent, useCallback, memo } from "react";
 
 import { useBookStore } from "@/features/catalog/stores/useBookStore";
 
@@ -19,21 +19,21 @@ const SORT_OPTIONS = [
   { label: "Publication Date", value: "publicationDate" as const },
 ];
 
-export default function CatalogFilters() {
+function CatalogFiltersComponent() {
   const filters = useBookStore((state) => state.filters);
   const updateFilters = useBookStore((state) => state.updateFilters);
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     updateFilters({ search: event.target.value });
-  };
+  }, [updateFilters]);
 
-  const handleCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
     updateFilters({ category: event.target.value as (typeof CATEGORY_OPTIONS)[number]["value"] });
-  };
+  }, [updateFilters]);
 
-  const handleSortChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleSortChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
     updateFilters({ sort: event.target.value as (typeof SORT_OPTIONS)[number]["value"] });
-  };
+  }, [updateFilters]);
 
   return (
     <div className={styles.container}>
@@ -74,3 +74,5 @@ export default function CatalogFilters() {
     </div>
   );
 }
+
+export default memo(CatalogFiltersComponent);
