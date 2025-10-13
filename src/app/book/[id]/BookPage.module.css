@@ -141,11 +141,11 @@
 }
 
 .starIconFilled {
-  fill: var(--accent-color);
+  fill: rgb(255, 251, 0);
 }
 
 .starIconEmpty {
-  fill: rgba(148, 163, 184, 0.35);
+  fill: rgba(255, 255, 0, 0.35);
 }
 
 .ratingScore {
