@@ -37,7 +37,7 @@ const initialFilters: BookFilters = {
 
 const initialPagination: PaginationState = {
   currentPage: 1,
-  pageSize: 12,
+  pageSize: 14,
 };
 
 const initialState = {
