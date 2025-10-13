@@ -101,9 +101,6 @@ export default function Header() {
             {isLoggedIn ? (
               <>
                 <span className={styles.username}>{username}</span>
-                <span className={styles.avatar}>
-                  <span className={styles.avatarGlow}></span>
-                </span>
                 <button
                   type="button"
                   onClick={handleLogout}
@@ -184,9 +181,6 @@ export default function Header() {
             {isLoggedIn ? (
               <div className={styles.mobileProfile}>
                 <div className={styles.mobileProfileInfo}>
-                  <span className={styles.avatar}>
-                    <span className={styles.avatarGlow}></span>
-                  </span>
                   <div className={styles.mobileProfileMeta}>
                     <span className={styles.mobileProfileLabel}>Logged in as</span>
                     <span className={styles.mobileProfileName}>{username}</span>

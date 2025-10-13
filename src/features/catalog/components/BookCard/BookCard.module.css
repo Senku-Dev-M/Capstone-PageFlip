@@ -64,36 +64,40 @@
   right: 0.75rem;
   top: 0.75rem;
   padding: 0.2rem 0.6rem;
-  border-radius: 999px;
+  border-radius: 0.75rem;
   font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  border: 1px solid transparent;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(8, 12, 22, 0.55);
+  backdrop-filter: saturate(140%) blur(4px);
+  color: #f1f5f9;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
 }
 
 .statusAvailable {
-  background: rgba(20, 184, 166, 0.18);
   color: var(--accent-color);
-  border-color: rgba(20, 184, 166, 0.35);
+  border-color: rgba(20, 184, 166, 0.6);
+  box-shadow: 0 6px 18px rgba(20, 184, 166, 0.18);
 }
 
 .statusBorrowed {
-  background: rgba(236, 72, 153, 0.2);
   color: #f9a8d4;
-  border-color: rgba(236, 72, 153, 0.4);
+  border-color: rgba(236, 72, 153, 0.55);
+  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.18);
 }
 
 .statusBorrowedByUser {
-  background: rgba(236, 72, 153, 0.15);
   color: var(--danger-color);
-  border-color: rgba(236, 72, 153, 0.35);
+  border-color: rgba(236, 72, 153, 0.5);
+  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.18);
 }
 
 .statusUnavailable {
-  background: rgba(100, 116, 139, 0.2);
   color: #cbd5f5;
-  border-color: rgba(148, 163, 184, 0.4);
+  border-color: rgba(148, 163, 184, 0.5);
+  box-shadow: 0 6px 18px rgba(100, 116, 139, 0.18);
 }
 
 .content {
