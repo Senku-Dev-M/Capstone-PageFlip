@@ -1,6 +1,7 @@
 "use client";
 
-import { create } from "zustand";
+import { create, type StateCreator } from "zustand";
+import { devtools } from "zustand/middleware";
 import type { Book } from "@/features/catalog/types/book";
 
 type CatalogCategory = "All" | "Fiction" | "Science" | "History";
@@ -47,36 +48,67 @@ const initialState = {
   pagination: initialPagination,
 };
 
-export const useBookStore = create<BookState>((set) => ({
+const createBookStore: StateCreator<BookState, [["zustand/devtools", never]]> = (set) => ({
   ...initialState,
   setBooks: (books) =>
-    set((state) => ({
-      books,
-      pagination: {
-        ...state.pagination,
-        currentPage: 1,
-      },
-    })),
-  setIsLoading: (isLoading) => set({ isLoading }),
+    set(
+      (state) => ({
+        books,
+        pagination: {
+          ...state.pagination,
+          currentPage: 1,
+        },
+      }),
+      false,
+      "book/setBooks",
+    ),
+  setIsLoading: (isLoading) =>
+    set(
+      { isLoading },
+      false,
+      "book/setIsLoading",
+    ),
   updateFilters: (filters) =>
-    set((state) => ({
-      filters: {
-        ...state.filters,
-        ...filters,
-      },
-      pagination: {
-        ...state.pagination,
-        currentPage: 1,
-      },
-    })),
+    set(
+      (state) => ({
+        filters: {
+          ...state.filters,
+          ...filters,
+        },
+        pagination: {
+          ...state.pagination,
+          currentPage: 1,
+        },
+      }),
+      false,
+      "book/updateFilters",
+    ),
   setPage: (page) =>
-    set((state) => ({
-      pagination: {
-        ...state.pagination,
-        currentPage: page,
-      },
-    })),
-  reset: () => set(initialState),
-}));
+    set(
+      (state) => ({
+        pagination: {
+          ...state.pagination,
+          currentPage: page,
+        },
+      }),
+      false,
+      "book/setPage",
+    ),
+  reset: () =>
+    set(
+      initialState,
+      false,
+      "book/reset",
+    ),
+});
+
+export const useBookStore = create<BookState>()(
+  devtools(createBookStore, {
+    name: "BookStore",
+    enabled: process.env.NODE_ENV !== "production",
+    trace: true,
+    traceLimit: 25,
+  }),
+);
 
 // TODO: Connect to Open Library API fetcher and Firebase caching.

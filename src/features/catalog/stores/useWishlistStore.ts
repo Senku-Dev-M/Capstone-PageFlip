@@ -1,6 +1,7 @@
 "use client";
 
-import { create } from "zustand";
+import { create, type StateCreator } from "zustand";
+import { devtools } from "zustand/middleware";
 
 export interface WishlistItem {
   id: string;
@@ -20,17 +21,26 @@ interface WishlistState {
   reset: () => void;
 }
 
-export const useWishlistStore = create<WishlistState>((set, get) => ({
+const createWishlistStore: StateCreator<WishlistState, [["zustand/devtools", never]]> = (set, get) => ({
   wishlistItems: [],
   userWishlist: [],
 
   setWishlistItems: (items: WishlistItem[]) => {
-    set({ wishlistItems: items });
+    set({ wishlistItems: items }, false, "wishlist/setItems");
   },
 
   isBookInWishlist: (bookId: string) => {
     return get().wishlistItems.some((item) => item.bookId === bookId);
   },
 
-  reset: () => set({ wishlistItems: [], userWishlist: [] }),
-}));
+  reset: () => set({ wishlistItems: [], userWishlist: [] }, false, "wishlist/reset"),
+});
+
+export const useWishlistStore = create<WishlistState>()(
+  devtools(createWishlistStore, {
+    name: "WishlistStore",
+    enabled: process.env.NODE_ENV !== "production",
+    trace: true,
+    traceLimit: 25,
+  }),
+);

@@ -1,6 +1,7 @@
 "use client";
 
-import { create } from "zustand";
+import { create, type StateCreator } from "zustand";
+import { devtools } from "zustand/middleware";
 
 type SessionUser = {
   id: string;
@@ -22,11 +23,35 @@ const initialState = {
   isLoading: true,
 };
 
-export const useUserStore = create<UserState>((set) => ({
+const createUserStore: StateCreator<UserState, [["zustand/devtools", never]]> = (set) => ({
   ...initialState,
-  setUser: (user) => set({ user }),
-  setIsLoading: (isLoading) => set({ isLoading }),
-  reset: () => set(initialState),
-}));
+  setUser: (user) =>
+    set(
+      { user },
+      false,
+      "user/setUser",
+    ),
+  setIsLoading: (isLoading) =>
+    set(
+      { isLoading },
+      false,
+      "user/setIsLoading",
+    ),
+  reset: () =>
+    set(
+      initialState,
+      false,
+      "user/reset",
+    ),
+});
+
+export const useUserStore = create<UserState>()(
+  devtools(createUserStore, {
+    name: "UserStore",
+    enabled: process.env.NODE_ENV !== "production",
+    trace: true,
+    traceLimit: 25,
+  }),
+);
 
 export type { SessionUser };

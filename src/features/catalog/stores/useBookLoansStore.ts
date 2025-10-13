@@ -1,6 +1,7 @@
 "use client";
 
-import { create } from "zustand";
+import { create, type StateCreator } from "zustand";
+import { devtools } from "zustand/middleware";
 
 export interface BookLoan {
   id: string;
@@ -27,16 +28,16 @@ interface BookLoansState {
   reset: () => void;
 }
 
-export const useBookLoansStore = create<BookLoansState>((set, get) => ({
+const createBookLoansStore: StateCreator<BookLoansState, [["zustand/devtools", never]]> = (set, get) => ({
   loans: [],
   userLoans: [],
 
   setLoans: (loans: BookLoan[]) => {
-    set({ loans });
+    set({ loans }, false, "loans/setLoans");
   },
 
   setUserLoans: (loans: BookLoan[]) => {
-    set({ userLoans: loans });
+    set({ userLoans: loans }, false, "loans/setUserLoans");
   },
 
   getBookAvailability: (bookId: string) => {
@@ -60,5 +61,14 @@ export const useBookLoansStore = create<BookLoansState>((set, get) => ({
     );
   },
 
-  reset: () => set({ loans: [], userLoans: [] }),
-}));
+  reset: () => set({ loans: [], userLoans: [] }, false, "loans/reset"),
+});
+
+export const useBookLoansStore = create<BookLoansState>()(
+  devtools(createBookLoansStore, {
+    name: "BookLoansStore",
+    enabled: process.env.NODE_ENV !== "production",
+    trace: true,
+    traceLimit: 25,
+  }),
+);
