@@ -98,9 +98,48 @@ export async function createLoan(book: Book, user: SessionUser): Promise<BookLoa
 
 export async function markLoanAsReturned(loanId: string): Promise<void> {
   const loanRef = doc(db, LOANS_COLLECTION, loanId);
+  const loanSnapshot = await getDoc(loanRef);
+
+  if (!loanSnapshot.exists()) {
+    throw new Error("LOAN_NOT_FOUND");
+  }
+
+  const loanData = loanSnapshot.data() as LoanDocument;
+
   await updateDoc(loanRef, {
     returnedAt: serverTimestamp(),
   });
+
+  const notificationPayload = {
+    bookId: loanData.bookId,
+    bookTitle: loanData.title,
+    bookAuthor: loanData.author,
+    excludeUserId: loanData.borrowedBy,
+  };
+
+  if (!notificationPayload.bookId) {
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/notifications/book-available", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(notificationPayload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Wishlist notification failed", {
+        status: response.status,
+        body: errorText,
+      });
+    }
+  } catch (error) {
+    console.error("Failed to trigger wishlist notification:", error);
+  }
 }
 
 export function subscribeToActiveLoans(

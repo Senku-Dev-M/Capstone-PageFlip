@@ -26,6 +26,8 @@ type WishlistDocument = {
   author: string;
   cover?: string | null;
   userId: string;
+  userEmail?: string | null;
+  userDisplayName?: string | null;
   addedAt: Timestamp | null;
 };
 
@@ -62,6 +64,8 @@ export async function addBookToWishlist(book: Book, user: SessionUser): Promise<
     author: book.author,
     cover: book.cover ?? null,
     userId: user.id,
+    userEmail: user.email,
+    userDisplayName: user.displayName ?? null,
     addedAt: serverTimestamp(),
   });
 }
