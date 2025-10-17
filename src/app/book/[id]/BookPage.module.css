@@ -1,7 +1,7 @@
 .section {
   max-width: 82rem;
   margin: 0 auto;
-  padding: clamp(1.5rem, 3vw, 2rem) clamp(1.5rem, 5vw, 3rem) 4rem;
+  padding: 2rem 3rem 4rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -15,27 +15,21 @@
   font-weight: 600;
   color: var(--accent-color);
   text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.backLink:hover {
-  color: var(--accent-color-strong);
 }
 
 .block {
   background: var(--surface-color);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--divider-color);
   border-radius: 1.5rem;
-  padding: clamp(2.25rem, 4.5vw, 3.1rem);
+  padding: 3.1rem;
   display: flex;
   flex-direction: column;
-  gap: clamp(2rem, 3vw, 2.75rem);
-  box-shadow: 0 28px 48px rgba(10, 15, 26, 0.35);
+  gap: 2.75rem;
 }
 
 .detailGrid {
   display: grid;
-  gap: clamp(1.75rem, 3vw, 2.5rem);
+  gap: 2.5rem;
   align-items: start;
 }
 
@@ -59,7 +53,7 @@
   aspect-ratio: 2 / 3;
   border-radius: 1.25rem;
   background: var(--surface-elevated);
-  border: 1px solid rgba(20, 184, 166, 0.25);
+  border: 1px solid var(--accent-color);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -102,12 +96,12 @@
   font-size: 0.75rem;
   letter-spacing: 0.45em;
   text-transform: uppercase;
-  color: rgba(20, 184, 166, 0.75);
+  color: var(--accent-color);
 }
 
 .title {
   margin: 0;
-  font-size: clamp(2.4rem, 4.5vw, 3rem);
+  font-size: 3rem;
   font-weight: 800;
   color: var(--accent-color);
 }
@@ -141,11 +135,11 @@
 }
 
 .starIconFilled {
-  fill: rgb(255, 251, 0);
+  fill: var(--accent-color);
 }
 
 .starIconEmpty {
-  fill: rgba(255, 255, 0, 0.35);
+  fill: var(--divider-color);
 }
 
 .ratingScore {
@@ -169,7 +163,6 @@
   margin: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  hyphens: auto;
 }
 
 @media (max-width: 768px) {
@@ -203,16 +196,7 @@
   text-decoration: none;
 }
 
-.descriptionLink:hover {
-  text-decoration: underline;
-  color: var(--accent-color-strong);
-}
 
-.descriptionLink:focus {
-  outline: 2px solid rgba(56, 189, 248, 0.6);
-  outline-offset: 2px;
-  border-radius: 0.25rem;
-}
 
 .metaRow {
   display: grid;

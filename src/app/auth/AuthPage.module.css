@@ -19,35 +19,7 @@
   pointer-events: none;
 }
 
-.glowTeal,
-.glowFuchsia {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.9;
-}
 
-.glowTeal {
-  left: -8rem;
-  top: 25%;
-  width: 20rem;
-  height: 20rem;
-  background: rgba(20, 184, 166, 0.18);
-}
-
-.glowFuchsia {
-  right: -5rem;
-  bottom: 4rem;
-  width: 18rem;
-  height: 18rem;
-  background: rgba(236, 72, 153, 0.18);
-}
-
-.radial {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top, rgba(20, 184, 166, 0.12), transparent 60%);
-}
 
 .hero {
   position: relative;
@@ -62,12 +34,12 @@
   font-size: 0.75rem;
   letter-spacing: 0.6em;
   text-transform: uppercase;
-  color: rgba(20, 184, 166, 0.7);
+  color: var(--accent-color);
 }
 
 .heroTitle {
   margin: 0;
-  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-size: 2.75rem;
   font-weight: 600;
   color: var(--primary-text);
 }
@@ -96,13 +68,12 @@
   border-radius: 1.5rem;
   padding: 1.5rem;
   background: var(--surface-color);
-  box-shadow: 0 18px 30px rgba(10, 15, 26, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--divider-color);
   min-width: 18rem;
 }
 
 .panel.fuchsia {
-  border-color: rgba(236, 72, 153, 0.25);
+  border-color: var(--danger-color);
 }
 
 .panelKicker {
@@ -127,29 +98,14 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.4em;
-  transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid transparent;
-  background: rgba(20, 184, 166, 0.15);
-  box-shadow: none;
+  border: 1px solid var(--accent-color);
+  background: transparent;
   color: var(--accent-color);
 }
 
-.panelButton:hover,
-.panelButton:focus-visible {
-  border-color: rgba(20, 184, 166, 0.4);
-  color: var(--accent-color-strong);
-  outline: none;
-}
-
 .panelButton.fuchsia {
-  background: rgba(236, 72, 153, 0.15);
+  border-color: var(--danger-color);
   color: var(--danger-color);
-}
-
-.panelButton.fuchsia:hover,
-.panelButton.fuchsia:focus-visible {
-  color: #fbbcd4;
-  border-color: rgba(236, 72, 153, 0.4);
 }
 
 @media (min-width: 768px) {

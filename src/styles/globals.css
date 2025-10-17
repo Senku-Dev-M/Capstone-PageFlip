@@ -1,7 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-  color-scheme: dark;
   --accent-color: #14b8a6;
   --accent-color-strong: #0d9488;
   --danger-color: #ec4899;
@@ -26,7 +25,6 @@ html,
 body {
   min-height: 100%;
   background-color: var(--pageflip-bg);
-  scroll-behavior: smooth;
 }
 
 body {
@@ -34,7 +32,6 @@ body {
   color: var(--primary-text);
   background: var(--bg-color);
   font-family: "Inter", ui-sans-serif, system-ui;
-  -webkit-font-smoothing: antialiased;
 }
 
 a {
@@ -50,34 +47,9 @@ button {
   cursor: pointer;
 }
 
-::selection {
-  background: rgba(20, 184, 166, 0.35);
-  color: var(--primary-text);
-}
-
-::-webkit-scrollbar {
-  width: 0.6rem;
-  height: 0.6rem;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(17, 24, 39, 0.65);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-color);
-  border-radius: 9999px;
-  box-shadow: 0 0 18px rgba(20, 184, 166, 0.25);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(20, 184, 166, 0.6);
-}
-
 .cyberpunk-card {
   background: var(--surface-color);
   border: 1px solid rgba(255, 255, 255, 0.04);
-  box-shadow: 0 14px 28px rgba(8, 11, 19, 0.45);
 }
 
 .cyber-input,
@@ -89,8 +61,6 @@ button {
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   color: var(--primary-text);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: none;
 }
 
 .cyber-input::placeholder {
@@ -100,18 +70,12 @@ button {
 .cyber-input:focus,
 .cyber-select:focus {
   border-color: rgba(20, 184, 166, 0.6);
-  box-shadow: 0 0 0 1px rgba(20, 184, 166, 0.35);
   outline: none;
 }
 
 .cyber-select {
   appearance: none;
   padding-right: 3rem;
-  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0)),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23e2e8f0' d='M5 6 0 0h10z'/%3E%3C/svg%3E");
-  background-position: left top, right 1rem center;
-  background-repeat: no-repeat;
-  background-size: cover, 0.75rem 0.5rem;
   color: var(--primary-text);
 }
 

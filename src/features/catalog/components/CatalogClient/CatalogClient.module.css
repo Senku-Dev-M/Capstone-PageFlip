@@ -6,12 +6,11 @@
 
 .loading {
   border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--divider-color);
   background: var(--surface-color);
   padding: 1rem;
   font-size: 0.9rem;
   color: var(--secondary-text);
-  box-shadow: 0 18px 30px rgba(10, 15, 26, 0.35);
 }
 
 .paginationCard {
@@ -19,7 +18,7 @@
   flex-direction: column;
   gap: 1rem;
   border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--divider-color);
   background: var(--surface-color);
   padding: 1rem;
   font-size: 0.85rem;
@@ -58,36 +57,20 @@
   align-items: center;
   justify-content: center;
   border-radius: 0.65rem;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid var(--divider-color);
   padding: 0.35rem 0.75rem;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--secondary-text);
   background: transparent;
-  transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   white-space: nowrap;
 }
 
-@media (max-width: 640px) {
-  .pageButton,
-  .navButton {
-    padding: 0.3rem 0.5rem;
-    font-size: 0.7rem;
-  }
-}
-
-.pageButton:hover,
-.navButton:hover {
-  border-color: rgba(20, 184, 166, 0.4);
-  color: var(--accent-color);
-}
-
 .pageButtonActive {
-  border-color: rgba(20, 184, 166, 0.6);
-  background: rgba(20, 184, 166, 0.18);
+  border-color: var(--accent-color);
+  background: transparent;
   color: var(--accent-color);
-  box-shadow: 0 0 15px rgba(20, 184, 166, 0.25);
 }
 
 .disabled {
