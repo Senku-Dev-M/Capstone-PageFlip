@@ -52,9 +52,9 @@ export default function LoginDialog({
     try {
       await signInWithEmailAndPassword(auth, email, password);
       setStatus("Connection established. Welcome back, operator.");
-    } catch (err) {
+    } catch (err: unknown) {
       const message =
-        err instanceof FirebaseError
+        err && typeof err === 'object' && 'message' in err && typeof err.message === 'string'
           ? err.message
           : "Unable to authenticate. Please try again.";
       setError(message);
@@ -156,7 +156,7 @@ export default function LoginDialog({
             </div>
 
             {error ? (
-              <p className={styles.alert}>
+              <p className={styles.alert} role="alert">
                 {error}
               </p>
             ) : null}

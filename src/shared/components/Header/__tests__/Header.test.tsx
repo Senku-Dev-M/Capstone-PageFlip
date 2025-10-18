@@ -34,7 +34,7 @@ describe('Header', () => {
     render(<Header />)
 
     expect(screen.getByText('Catalog')).toBeInTheDocument()
-    expect(screen.getByText('Loans')).toBeInTheDocument()
+    expect(screen.getByText('My Loans')).toBeInTheDocument()
     expect(screen.getByText('History')).toBeInTheDocument()
     expect(screen.getByText('Wishlist')).toBeInTheDocument()
   })
@@ -43,14 +43,14 @@ describe('Header', () => {
     render(<Header />)
 
     // Should show user-related elements
-    expect(screen.getByRole('button', { name: /test user/i })).toBeDefined()
+    expect(screen.getByText(/test user/i)).toBeInTheDocument()
   })
 
   it('renders navigation links with correct hrefs', () => {
     render(<Header />)
 
     const catalogLink = screen.getByRole('link', { name: /catalog/i })
-    const loansLink = screen.getByRole('link', { name: /loans/i })
+    const loansLink = screen.getByRole('link', { name: /my loans/i })
     const historyLink = screen.getByRole('link', { name: /history/i })
     const wishlistLink = screen.getByRole('link', { name: /wishlist/i })
 

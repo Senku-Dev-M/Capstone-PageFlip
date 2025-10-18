@@ -5,7 +5,11 @@ import HistoryPage from '../page'
 // Mock Next.js Image component
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: (props: any) => <img {...props} />
+  default: (props: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { fill, priority, ...rest } = props
+    return <img {...rest} />
+  },
 }))
 
 // Mock the hook
@@ -26,7 +30,11 @@ describe('HistoryPage', () => {
     render(<HistoryPage />)
 
     expect(screen.getByText('Reading History')).toBeInTheDocument()
-    expect(screen.getByText('No returned books yet. Start borrowing to see your reading history here.')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'No returned books yet. Start borrowing to see your reading history here.',
+      ),
+    ).toBeInTheDocument()
   })
 
   it('renders returned books when available', () => {
@@ -84,7 +92,7 @@ describe('HistoryPage', () => {
       {
         id: '1',
         bookId: 'book1',
-        title: 'AB',
+        title: 'Another Book',
         author: 'Author',
         borrowedAt: '2024-01-01T00:00:00.000Z',
         returnedAt: '2024-01-05T00:00:00.000Z',
@@ -95,7 +103,7 @@ describe('HistoryPage', () => {
     mockUserReturnedBooks.mockReturnValue(mockBooks)
     render(<HistoryPage />)
 
-    const initials = screen.getByText('AB')
+    const initials = screen.getByText('AN')
     expect(initials).toBeInTheDocument()
   })
 

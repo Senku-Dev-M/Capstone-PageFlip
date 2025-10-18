@@ -1,7 +1,8 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import BookLoanActions from '../BookLoanActions'
+import { useBookLoansStore } from '@/features/catalog/stores/useBookLoansStore'
 
 // Mock hooks
 const mockBorrowBook = jest.fn()
@@ -24,11 +25,7 @@ jest.mock('@/features/catalog/hooks/useWishlist', () => ({
   }),
 }))
 
-jest.mock('@/features/catalog/stores/useBookLoansStore', () => ({
-  useBookLoansStore: () => ({
-    loans: [],
-  }),
-}))
+jest.mock('@/features/catalog/stores/useBookLoansStore')
 
 jest.mock('@/features/auth/stores/useUserStore', () => ({
   useUserStore: () => ({
@@ -45,7 +42,8 @@ describe('BookLoanActions', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.clearAllMocks();
+    (useBookLoansStore as jest.Mock).mockReturnValue([])
   })
 
   it('renders borrow button when book is available', () => {

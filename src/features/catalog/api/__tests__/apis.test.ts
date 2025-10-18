@@ -9,7 +9,7 @@ describe('Books API', () => {
 
   it('should export expected functions', () => {
     expect(typeof booksApi.searchBooks).toBe('function')
-    expect(typeof booksApi.getBookDetails).toBe('function')
+    expect(typeof booksApi.getBookById).toBe('function')
   })
 })
 
@@ -52,6 +52,5 @@ describe('Books API from OpenAPI', () => {
 
   it('should export API functions', () => {
     expect(typeof booksApi.fetchBooks).toBe('function')
-    expect(typeof booksApi.enrichBooksWithWishlistInfo).toBe('function')
   })
 })

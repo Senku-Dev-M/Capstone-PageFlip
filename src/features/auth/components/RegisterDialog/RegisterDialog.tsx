@@ -66,9 +66,9 @@ export default function RegisterDialog({
       }
 
       setStatus("Registration successful. Credentials synced with the network.");
-    } catch (err) {
+    } catch (err: unknown) {
       const message =
-        err instanceof FirebaseError
+        err && typeof err === 'object' && 'message' in err && typeof err.message === 'string'
           ? err.message
           : "Unable to register. Please verify your inputs.";
       setError(message);
@@ -128,7 +128,7 @@ export default function RegisterDialog({
             </p>
           </header>
 
-          <form className={styles.form} onSubmit={handleSubmit}>
+          <form className={styles.form} onSubmit={handleSubmit} data-testid="register-form">
             <div className={styles.field}>
               <label htmlFor="register-username" className={styles.label}>
                 Codename
@@ -189,7 +189,7 @@ export default function RegisterDialog({
               />
             </div>
 
-            {error ? <p className={styles.alert}>{error}</p> : null}
+            {error ? <p className={styles.alert} role="alert">{error}</p> : null}
 
             {status ? <p className={styles.status}>{status}</p> : null}
 
