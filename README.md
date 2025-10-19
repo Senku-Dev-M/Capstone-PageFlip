@@ -73,7 +73,6 @@ src/
 | `useBookStore` | `src/features/catalog/stores/useBookStore.ts` | Catalogo, filtros y paginacion | Sincroniza libros cargados, filtros, `useDeferredValue` y `AbortController` para busqueda. |
 | `useBookLoansStore` | `src/features/catalog/stores/useBookLoansStore.ts` | Prestamos activos y por usuario | Expone selectores para disponibilidad y reutiliza en hooks `useBookLoans` y `useBookHistory`. |
 | `useWishlistStore` | `src/features/catalog/stores/useWishlistStore.ts` | Wishlist por usuario | Guarda items suscritos en tiempo real y chequea existencia antes de agregar. |
-| `useLoanStore` | `src/features/catalog/stores/useLoanStore.ts` | Estado compuesto (legacy) | Store alternativo para flujos agregados; mantenlo solo si necesitas compatibilidad mientras migras a Firestore. |
 
 Cada hook (`useBookLoans`, `useWishlist`, `useBookHistory`) comparte suscripciones a Firestore con contadores internos para evitar duplicar listeners cuando varios componentes montan simultaneamente.
 
@@ -180,7 +179,6 @@ La normalizacion en `loans.ts` y `wishlist.ts` transforma `Timestamp` en ISO str
 
 ## Roadmap sugerido
 
-- Consolidar la persistencia de `useLoanStore` sobre Firestore o eliminar el store legacy si ya no aporta valor.
 - Integrar Firebase Analytics y un plan de caching adicional para mejorar observabilidad y tiempos de respuesta.
 - Implementar persistencia offline o caching local para catalogo cuando la API externa falle.
 - Integrar un gestor de toasts global (p.ej. `<Toaster />`) y mensajes de error mas detallados.
