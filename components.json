@@ -5,15 +5,15 @@
   "tsx": true,
   "styling": {
     "strategy": "css-modules",
-    "globals": "src/styles/globals.css"
+    "globals": "src/shared/styles/globals.css"
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@/shared/components",
+    "components": "@/shared/ui",
     "utils": "@/shared/utils",
-    "ui": "@/shared/components",
-    "lib": "@/core",
-    "hooks": "@/features"
+    "ui": "@/shared/ui",
+    "lib": "@/config",
+    "hooks": "@/modules"
   },
   "registries": {}
 }

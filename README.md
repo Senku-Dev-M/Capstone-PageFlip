@@ -44,7 +44,7 @@ PageFlip es una app web creada con Next.js 15 que combina el estilo de una bibli
 - TypeScript estricto con alias `@/*` definido en `tsconfig.json`.
 - Firebase (Auth + Firestore) para identidad y persistencia en tiempo real.
 - Zustand + Devtools para stores predecibles y trazables.
-- CSS Modules y hoja global (`src/styles/globals.css`) para la tematizacion ciberpunk.
+- CSS Modules y hoja global (`src/shared/styles/globals.css`) para la tematizacion ciberpunk.
 - React Hot Toast para feedback no intrusivo.
 - Herramientas de calidad: ESLint 9 y PostCSS.
 
@@ -52,35 +52,38 @@ PageFlip es una app web creada con Next.js 15 que combina el estilo de una bibli
 
 ```
 src/
-  app/                # Rutas Next.js (catalogo, auth, loans, wishlist, history, book/[id])
-  core/               # Singletons agnosticos, p.ej. configuracion de Firebase
-  features/
-    auth/             # API, componentes de dialogo, hooks y store de usuario
-    catalog/          # API REST/Open Library, stores, hooks y componentes del catalogo
-  shared/             # Layouts y utilidades reutilizables (Header, helpers)
-  styles/             # Estilos globales
+  app/                # Rutas Next.js con grupos (public) y (private), ademas de endpoints API
+  modules/
+    auth/             # API, UI (modales), hooks y store del dominio de autenticacion
+    catalog/          # API externas, UI, hooks, store, utils y tipos del catalogo
+  shared/
+    ui/               # Componentes reutilizables como Header
+    utils/            # Helpers agnosticos (ej. `cn`)
+    styles/           # Estilos globales y tokens
+    services/         # Integraciones transversales (espacio reservado)
+  config/             # Singletons de configuracion (Firebase, constantes)
 ```
 
-- Las paginas se alojan en la carpeta `app/` y combinan server y client components segun la necesidad.
-- Cada feature co-loca UI, estado (`stores/`), hooks y helpers para mantener alta cohesion.
-- Los estilos se distribuyen como `.module.css` junto a cada componente para favorecer el mantenimiento.
+- Las paginas residen en `app/`, agrupadas en `(public)` y `(private)` para diferenciar flujos abiertos vs autenticados.
+- Cada dominio vive en `modules/` y co-loca su API, UI, hooks, store y pruebas para mantener cohesion y escalabilidad.
+- Los estilos globales se concentran en `shared/styles` y cada componente mantiene su propio `.module.css` adjunto.
 
 ## Stores y estado
 
 | Store | Archivo | Dominio | Detalles |
 | ----- | ------- | ------- | -------- |
-| `useUserStore` | `src/features/auth/stores/useUserStore.ts` | Sesion y carga inicial | Mantiene usuario normalizado, integra devtools y controla `isLoading`. |
-| `useBookStore` | `src/features/catalog/stores/useBookStore.ts` | Catalogo, filtros y paginacion | Sincroniza libros cargados, filtros, `useDeferredValue` y `AbortController` para busqueda. |
-| `useBookLoansStore` | `src/features/catalog/stores/useBookLoansStore.ts` | Prestamos activos y por usuario | Expone selectores para disponibilidad y reutiliza en hooks `useBookLoans` y `useBookHistory`. |
-| `useWishlistStore` | `src/features/catalog/stores/useWishlistStore.ts` | Wishlist por usuario | Guarda items suscritos en tiempo real y chequea existencia antes de agregar. |
+| `useUserStore` | `src/modules/auth/store/useUserStore.ts` | Sesion y carga inicial | Mantiene usuario normalizado, integra devtools y controla `isLoading`. |
+| `useBookStore` | `src/modules/catalog/store/useBookStore.ts` | Catalogo, filtros y paginacion | Sincroniza libros cargados, filtros, `useDeferredValue` y `AbortController` para busqueda. |
+| `useBookLoansStore` | `src/modules/catalog/store/useBookLoansStore.ts` | Prestamos activos y por usuario | Expone selectores para disponibilidad y reutiliza en hooks `useBookLoans` y `useBookHistory`. |
+| `useWishlistStore` | `src/modules/catalog/store/useWishlistStore.ts` | Wishlist por usuario | Guarda items suscritos en tiempo real y chequea existencia antes de agregar. |
 
 Cada hook (`useBookLoans`, `useWishlist`, `useBookHistory`) comparte suscripciones a Firestore con contadores internos para evitar duplicar listeners cuando varios componentes montan simultaneamente.
 
 ## Integraciones externas
 
-- **Open Library API** (`features/catalog/api/booksApi.ts` y `book/[id]/page.tsx`): busqueda, fichas de obras y recomendaciones, con almacenamiento en cache via `revalidate`.
-- **Firebase Auth** (`core/firebase.ts`, `features/auth/api/auth.ts`): login, registro y cierre de sesion email/password.
-- **Cloud Firestore** (`features/catalog/api/loans.ts`, `wishlist.ts`): colecciones `loans` y `wishlists` con suscripciones `onSnapshot`.
+- **Open Library API** (`modules/catalog/api/booksApi.ts` y `app/(private)/book/[id]/page.tsx`): busqueda, fichas de obras y recomendaciones, con almacenamiento en cache via `revalidate`.
+- **Firebase Auth** (`config/firebase.ts`, `modules/auth/api/auth.ts`): login, registro y cierre de sesion email/password.
+- **Cloud Firestore** (`modules/catalog/api/loans.ts`, `modules/catalog/api/wishlist.ts`): colecciones `loans` y `wishlists` con suscripciones `onSnapshot`.
 - **SendGrid** (`app/api/notifications/book-available/route.ts`): envia correos cuando un libro vuelve a estar disponible para las personas que lo tenian en wishlist.
 - **Next Image**: manejo de portadas remotas habilitado mediante `next.config.ts`.
 

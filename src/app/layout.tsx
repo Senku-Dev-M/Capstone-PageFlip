@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import "../styles/globals.css";
-import Header from "@/shared/components/Header";
+import "@/shared/styles/globals.css";
+import Header from "@/shared/ui/Header";
 
 import styles from "./layout.module.css";
 

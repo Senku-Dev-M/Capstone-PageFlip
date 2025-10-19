@@ -7,7 +7,7 @@ import {
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
 
-import { db } from "@/core/firebase";
+import { db } from "@/config/firebase";
 
 const SENDGRID_ENDPOINT = "https://api.sendgrid.com/v3/mail/send";
 
