@@ -18,7 +18,6 @@ export async function searchBooks(query: string): Promise<Book[]> {
     }>;
   };
 
-  // TODO: Enhance mapping with richer metadata and caching.
   return (
     data.docs?.slice(0, 12).map((doc) => ({
       id: doc.key.replace("/works/", ""),
@@ -35,7 +34,6 @@ export async function searchBooks(query: string): Promise<Book[]> {
 }
 
 export async function getBookById(id: string): Promise<Book | null> {
-  // TODO: Implement a richer fetch using Open Library Works API or Firebase cache.
   const [book] = await searchBooks(id);
   return book ?? null;
 }

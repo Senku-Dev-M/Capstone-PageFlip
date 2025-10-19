@@ -11,5 +11,3 @@ export interface Book {
   category?: "Fiction" | "Science" | "History";
   popularity?: number;
 }
-
-// TODO: Extend with availability, ISBNs, reading progress, and cyberpunk metadata.

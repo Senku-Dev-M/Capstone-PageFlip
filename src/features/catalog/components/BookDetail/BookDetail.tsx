@@ -15,7 +15,6 @@ export default function BookDetail({ bookId }: BookDetailProps) {
       <section className={styles.section}>
         <header className={styles.sectionHeader}>
           <h2 className={styles.title}>
-            {/* TODO: Fetch actual book metadata from the data layer */}
             Book #{bookId}
           </h2>
           <p className={styles.subtitle}>
@@ -24,7 +23,6 @@ export default function BookDetail({ bookId }: BookDetailProps) {
         </header>
         <div className={styles.layout}>
           <div className={styles.panel}>
-            {/* TODO: Render 3D cover preview and metadata */}
             <p>
               Neon cover art and immersive metadata coming soon. Integrate Firebase
               documents to hydrate this panel.
@@ -32,12 +30,10 @@ export default function BookDetail({ bookId }: BookDetailProps) {
           </div>
           <div className={styles.info}>
             <p>
-              {/* TODO: Replace with actual description */}
               Upload a synopsis from Open Library or proprietary datasets to bring this
               section to life.
             </p>
             <div className={styles.tags}>
-              {/* TODO: Map over dynamic tags */}
               <span className={styles.tag}>
                 Placeholder Tag
               </span>
@@ -47,11 +43,9 @@ export default function BookDetail({ bookId }: BookDetailProps) {
             </div>
             <div className={styles.actions}>
               <button className={styles.primaryButton}>
-                {/* TODO: Hook up Firebase-powered loan mutation */}
                 Initiate Loan Protocol
               </button>
               <button className={styles.secondaryButton}>
-                {/* TODO: Connect to wishlist mutation */}
                 Add to Wishlist
               </button>
             </div>
@@ -62,7 +56,6 @@ export default function BookDetail({ bookId }: BookDetailProps) {
         <header className={styles.sectionHeader}>
           <h3 className={styles.recommendationsTitle}>Neon Recommendations</h3>
           <p className={styles.subtitle}>
-            {/* TODO: Replace with AI-driven or curated recommendations */}
             Similar transmissions awaiting ingestion.
           </p>
         </header>

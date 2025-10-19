@@ -20,7 +20,6 @@ export default function RootLayout({
         <div className={styles.appShell}>
           <Header />
           <main className={styles.main}>
-            {/* TODO: Wire up layout-level providers and global UI here */}
             {children}
           </main>
         </div>

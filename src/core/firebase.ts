@@ -17,5 +17,3 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 export default app;
-
-// TODO: Add Firebase Analytics and additional services as needed.

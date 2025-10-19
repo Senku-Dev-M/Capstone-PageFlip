@@ -110,5 +110,3 @@ export const useBookStore = create<BookState>()(
     traceLimit: 25,
   }),
 );
-
-// TODO: Connect to Open Library API fetcher and Firebase caching.

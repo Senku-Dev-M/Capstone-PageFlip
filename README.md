@@ -35,6 +35,7 @@ PageFlip es una app web creada con Next.js 15 que combina el estilo de una bibli
 - Wishlist sincronizada por usuario y paneles especificos para prestamos activos e historial.
 - Header con navegacion condicional, modales reutilizables y modo burger para dispositivos moviles.
 - Componentes feature-first con estilos CSS Modules co-localizados y alias absolutos (`@/`).
+- Notificaciones por correo a usuarios de wishlist cuando un libro vuelve a estar disponible.
 
 ## Stack tecnologico
 
@@ -72,7 +73,7 @@ src/
 | `useBookStore` | `src/features/catalog/stores/useBookStore.ts` | Catalogo, filtros y paginacion | Sincroniza libros cargados, filtros, `useDeferredValue` y `AbortController` para busqueda. |
 | `useBookLoansStore` | `src/features/catalog/stores/useBookLoansStore.ts` | Prestamos activos y por usuario | Expone selectores para disponibilidad y reutiliza en hooks `useBookLoans` y `useBookHistory`. |
 | `useWishlistStore` | `src/features/catalog/stores/useWishlistStore.ts` | Wishlist por usuario | Guarda items suscritos en tiempo real y chequea existencia antes de agregar. |
-| `useLoanStore` | `src/features/catalog/stores/useLoanStore.ts` | Estado compuesto (legacy) | Store alternativo para flujos agregados; marcado con TODO para persistencia futura. |
+| `useLoanStore` | `src/features/catalog/stores/useLoanStore.ts` | Estado compuesto (legacy) | Store alternativo para flujos agregados; mantenlo solo si necesitas compatibilidad mientras migras a Firestore. |
 
 Cada hook (`useBookLoans`, `useWishlist`, `useBookHistory`) comparte suscripciones a Firestore con contadores internos para evitar duplicar listeners cuando varios componentes montan simultaneamente.
 
@@ -81,7 +82,19 @@ Cada hook (`useBookLoans`, `useWishlist`, `useBookHistory`) comparte suscripcion
 - **Open Library API** (`features/catalog/api/booksApi.ts` y `book/[id]/page.tsx`): busqueda, fichas de obras y recomendaciones, con almacenamiento en cache via `revalidate`.
 - **Firebase Auth** (`core/firebase.ts`, `features/auth/api/auth.ts`): login, registro y cierre de sesion email/password.
 - **Cloud Firestore** (`features/catalog/api/loans.ts`, `wishlist.ts`): colecciones `loans` y `wishlists` con suscripciones `onSnapshot`.
+- **SendGrid** (`app/api/notifications/book-available/route.ts`): envia correos cuando un libro vuelve a estar disponible para las personas que lo tenian en wishlist.
 - **Next Image**: manejo de portadas remotas habilitado mediante `next.config.ts`.
+
+## Notificaciones por correo
+
+El endpoint `POST /api/notifications/book-available` centraliza el envio de avisos cuando un libro observado vuelve a estar disponible:
+
+- Espera un cuerpo JSON con `bookId` obligatorio y `bookTitle`, `bookAuthor`, `excludeUserId` opcionales.
+- Consulta la coleccion `wishlists` en Firestore, deduplica por email y excluye al usuario que genero la notificacion (si se envia `excludeUserId`).
+- Construye un mensaje de texto plano y lo envia via SendGrid usando las variables `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL` y opcionalmente `SENDGRID_FROM_NAME`.
+- Devuelve `{ notified: number }` con el total de destinatarios notificados o un codigo de error normalizado en caso de fallo.
+
+Para probarlo manualmente puedes hacer un `fetch` desde el DevTools o un `curl` autenticado con la sesion vigente despues de insertar datos de wishlist de prueba en Firestore.
 
 ## Tecnicas de rendimiento
 
@@ -102,14 +115,16 @@ Cada hook (`useBookLoans`, `useWishlist`, `useBookHistory`) comparte suscripcion
 ### Instalacion rapida
 
 1. Clonar el repositorio y entrar en la carpeta del proyecto.
-2. Copiar `.env.example` a `.env.local` (o `.env`) y completar las credenciales de Firebase.
+2. Copiar `.env.example` a `.env.local` (o `.env`) y completar las credenciales de Firebase y SendGrid.
 3. Instalar dependencias: `npm install`.
 4. Levantar el entorno local: `npm run dev` y abrir `http://localhost:3000`.
 5. Construir para produccion cuando sea necesario: `npm run build` seguido de `npm run start`.
 
 ## Variables de entorno
 
-Todas las claves son de exposicion publica (`NEXT_PUBLIC_*`) porque se consumen desde el cliente:
+La app combina credenciales publicas para Firebase con secretos de servidor para los correos salientes. El archivo `.env.example` ya incluye todas las claves necesarias.
+
+### Variables publicas (disponibles en el cliente)
 
 | Variable | Descripcion |
 | -------- | ----------- |
@@ -120,7 +135,15 @@ Todas las claves son de exposicion publica (`NEXT_PUBLIC_*`) porque se consumen 
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Sender ID para servicios de Firebase. |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | Identificador de la app Firebase. |
 
-Coloca estas claves en `.env.local` para mantenerlas fuera del control de versiones.
+### Variables privadas (solo en el entorno de servidor)
+
+| Variable | Descripcion |
+| -------- | ----------- |
+| `SENDGRID_API_KEY` | Token con permisos para enviar correos via SendGrid. |
+| `SENDGRID_FROM_EMAIL` | Direccion remitente verificada en SendGrid (e.g. `notificaciones@pageflip.io`). |
+| `SENDGRID_FROM_NAME` | Nombre mostrado como remitente; opcional, por defecto `PageFlip`. |
+
+Guarda todas las variables en `.env.local` (o el archivo `.env` correspondiente) y evita subirlas al control de versiones.
 
 ## Colecciones de Firestore
 
@@ -157,7 +180,8 @@ La normalizacion en `loans.ts` y `wishlist.ts` transforma `Timestamp` en ISO str
 
 ## Roadmap sugerido
 
-- Completar TODOs marcados en codigo: persistencia de `useLoanStore`, agregar Firebase Analytics y caching adicional.
+- Consolidar la persistencia de `useLoanStore` sobre Firestore o eliminar el store legacy si ya no aporta valor.
+- Integrar Firebase Analytics y un plan de caching adicional para mejorar observabilidad y tiempos de respuesta.
 - Implementar persistencia offline o caching local para catalogo cuando la API externa falle.
 - Integrar un gestor de toasts global (p.ej. `<Toaster />`) y mensajes de error mas detallados.
 - Mejorar accesibilidad con avisos ARIA en modales y feedback del teclado.

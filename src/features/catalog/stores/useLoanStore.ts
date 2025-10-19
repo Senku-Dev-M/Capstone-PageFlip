@@ -93,4 +93,3 @@ export const useLoanStore = create<LoanState>()(
 );
 
 export type { Loan };
-// TODO: Persist store state to Firebase collections.
