@@ -25,6 +25,10 @@ describe('RegisterDialog', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('returns null when the dialog is closed', () => {
     const { container } = render(
       <RegisterDialog
@@ -54,7 +58,7 @@ describe('RegisterDialog', () => {
     await user.type(screen.getByLabelText(/^Email Address$/i), 'trinity@zion.io');
     await user.type(screen.getByLabelText(/^Access Key$/i), 'matrix');
     await user.type(screen.getByLabelText(/Confirm Access Key/i), 'nebuchadnezzar');
-    await user.click(screen.getByRole('button', { name: /Register/i }));
+    await user.click(screen.getByRole('button', { name: /^Register$/i }));
 
     expect(createUserWithEmailAndPassword).not.toHaveBeenCalled();
     expect(
@@ -70,12 +74,12 @@ describe('RegisterDialog', () => {
     const onClose = jest.fn();
     render(<RegisterDialog {...defaultProps()} onClose={onClose} />);
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     await user.type(screen.getByLabelText(/Codename/i), '  Trinity  ');
     await user.type(screen.getByLabelText(/^Email Address$/i), 'trinity@zion.io');
     await user.type(screen.getByLabelText(/^Access Key$/i), 'matrix');
     await user.type(screen.getByLabelText(/Confirm Access Key/i), 'matrix');
-    await user.click(screen.getByRole('button', { name: /Register/i }));
+    await user.click(screen.getByRole('button', { name: /^Register$/i }));
 
     expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
       {},
@@ -95,12 +99,11 @@ describe('RegisterDialog', () => {
       ).toBeInTheDocument(),
     );
 
-    await act(async () => {
-      jest.runOnlyPendingTimers();
+    act(() => {
+      jest.advanceTimersByTime(3000);
     });
 
     expect(onClose).toHaveBeenCalled();
-    jest.useRealTimers();
   });
 
   it('shows error feedback when registration fails', async () => {
@@ -114,7 +117,7 @@ describe('RegisterDialog', () => {
     await user.type(screen.getByLabelText(/^Email Address$/i), 'neo@zion.io');
     await user.type(screen.getByLabelText(/^Access Key$/i), 'matrix');
     await user.type(screen.getByLabelText(/Confirm Access Key/i), 'matrix');
-    await user.click(screen.getByRole('button', { name: /Register/i }));
+    await user.click(screen.getByRole('button', { name: /^Register$/i }));
 
     await waitFor(() =>
       expect(screen.getByText('Registration denied')).toBeInTheDocument(),

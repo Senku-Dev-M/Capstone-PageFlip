@@ -24,6 +24,10 @@ describe('LoginDialog', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('returns null when the dialog is closed', () => {
     const { container } = render(
       <LoginDialog
@@ -51,7 +55,7 @@ describe('LoginDialog', () => {
     const onClose = jest.fn();
     render(<LoginDialog {...defaultProps()} onClose={onClose} />);
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     await user.type(screen.getByLabelText(/Email Address/i), 'neo@matrix.io');
     await user.type(screen.getByLabelText(/Access Key/i), 'trinity');
     await user.click(screen.getByRole('button', { name: /Connect/i }));
@@ -64,12 +68,11 @@ describe('LoginDialog', () => {
       ).toBeInTheDocument(),
     );
 
-    await act(async () => {
-      jest.runOnlyPendingTimers();
+    act(() => {
+      jest.advanceTimersByTime(3000);
     });
 
     expect(onClose).toHaveBeenCalled();
-    jest.useRealTimers();
   });
 
   it('shows error feedback when authentication fails', async () => {
